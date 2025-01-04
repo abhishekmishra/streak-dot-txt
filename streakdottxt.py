@@ -227,6 +227,11 @@ class TerminalDisplay:
             day_date = datetime.date(first_day.year, first_day.month, day)
             if day_date > current_date:
                 day_display = f"[on dark_gray]{day:2} [-][/]"
+            elif day_date == current_date:
+                if day in ticked_days:
+                    day_display = f"[bold][on green]{day:2} [✓][/][/bold]"
+                else:
+                    day_display = f"[bold][on blue]{day:2} [ ][/][/bold]"
             else:
                 if day in ticked_days:
                     day_display = f"[on green]{day:2} [✓][/]"
