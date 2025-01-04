@@ -223,7 +223,7 @@ if __name__ == "__main__":
             command = "view"
             if len(sys.argv) > 2:
                 command = sys.argv[2]
-            if command == "mark":
+            if command == "mark" or command == "tick":
                 streak.mark_today()
             elif command == "view":
                 print("Streak name is [" + streak.name + "]")
