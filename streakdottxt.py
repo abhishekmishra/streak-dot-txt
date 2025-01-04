@@ -106,6 +106,15 @@ class Streak:
         return self.years
 
     def display_streak_calendar(self):
+        display = TerminalDisplay(self)
+        display.display_streak_calendar()
+
+
+class TerminalDisplay:
+    def __init__(self, streak):
+        self.streak = streak
+
+    def display_streak_calendar(self):
         """
         Display the streak calendar till today's date only for the current year.
 
@@ -156,7 +165,7 @@ class Streak:
         # create a set of ticked days for the current month
         ticked_days = {
             tick.get_day()
-            for tick in self.ticks
+            for tick in self.streak.ticks
             if tick.get_month() == first_day.month and tick.get_year() == first_day.year
         }
 
