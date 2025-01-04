@@ -4,7 +4,8 @@ import dateutil.parser
 import datetime
 import click
 
-DEFAULT_STREAKS_DIR = "streaks"
+# Default directory to store streaks is "streaks" in the home directory
+DEFAULT_STREAKS_DIR = os.path.join(os.path.expanduser("~"), "streaks")
 
 
 class DailyTick:
@@ -148,6 +149,13 @@ class TerminalDisplay:
     def __init__(self, streak):
         self.streak = streak
 
+    def display_streak_info(self):
+        """
+        Display the streak information
+        """
+        print("Name [" + self.streak.name + "]")
+        print("Tick [" + self.streak.tick + "]")
+
     def display_streak_calendar(self):
         """
         Display the streak calendar till today's date only for the current year.
@@ -224,7 +232,9 @@ class TerminalDisplay:
 @click.option("--file", help="Streak file to view or mark")
 @click.option(
     "--name",
-    help="Name of the streak (fuzzy matched, will fail if there are multiple matches or no matches)",
+    help="""Name of the streak 
+    (fuzzy matched, will fail if there are multiple matches or no matches)
+    If the file is specified, this option is ignored""",
 )
 @click.argument("command", default="view", required=False)
 def streak_command(dir, file, name, command):
@@ -237,13 +247,35 @@ def streak_command(dir, file, name, command):
         if command == "mark" or command == "tick":
             streak.mark_today()
         elif command == "view":
-            print("Streak name is [" + streak.name + "]")
-            print("Streak tick is [" + streak.tick + "]")
             display = TerminalDisplay(streak)
+            display.display_streak_info()
             display.display_streak_calendar()
         else:
             print("Command not recognized")
             sys.exit(1)
+    elif name:
+        # get the list of files in the directory
+        files = os.listdir(dir)
+        # fuzzy match the name
+        matches = [f for f in files if name in f]
+        if len(matches) == 0:
+            print("No streaks found")
+            sys.exit(1)
+        elif len(matches) > 1:
+            print("Multiple streaks found")
+            sys.exit(1)
+        else:
+            streak_file = os.path.join(dir, matches[0])
+            streak = Streak(streak_file)
+            if command == "mark" or command == "tick":
+                streak.mark_today()
+            elif command == "view":
+                display = TerminalDisplay(streak)
+                display.display_streak_info()
+                display.display_streak_calendar()
+            else:
+                print("Command not recognized")
+                sys.exit(1)
     else:
         print("No file provided")
         sys.exit(1)
