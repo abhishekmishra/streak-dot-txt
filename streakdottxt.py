@@ -359,6 +359,18 @@ def streak_command(dir, file, name, command):
         streak = get_streak_from_file_or_name(file, name)
         display = TerminalDisplay(streak)
         display.display_all()
+    elif command == "new":
+        if not name:
+            print("Name is required for creating a new streak")
+            sys.exit(1)
+        name_in_path = name.replace(" ", "-").lower()
+        streak_file = os.path.join(dir, f"streak-{name_in_path}.txt")
+        if os.path.exists(streak_file):
+            print("Streak already exists")
+        else:
+            with open(streak_file, "w") as f:
+                f.write(f"---\nname: {name}\ntick: Daily\n---\n")
+            print(f"Streak '{name}' created")
     else:
         print("Command not recognized")
         sys.exit(1)
