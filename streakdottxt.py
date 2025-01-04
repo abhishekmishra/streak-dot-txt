@@ -5,33 +5,36 @@ import datetime
 
 
 class DailyTick:
-    def __init__(self, date_str):
-        self.date_str = date_str
+    def __init__(self, tick_datetime_str):
+        self.tick_datetime_str = tick_datetime_str
         # parse ISO8601 date using dateutil.parser
-        self.date = dateutil.parser.parse(date_str)
+        self.tick_datetime = dateutil.parser.parse(tick_datetime_str)
 
     def get_year(self):
-        return self.date.year
+        return self.tick_datetime.year
 
     def get_month(self):
-        return self.date.month
+        return self.tick_datetime.month
 
     def get_day(self):
-        return self.date.day
+        return self.tick_datetime.day
 
     def get_weekday(self):
-        return self.date.weekday()
+        return self.tick_datetime.weekday()
 
     def get_week_in_month(self):
         # get the week in the month
-        return (self.date.day - 1) // 7 + 1
+        return (self.tick_datetime.day - 1) // 7 + 1
 
     def get_week_in_year(self):
         # get the week in the year
-        return self.date.isocalendar()[1]
+        return self.tick_datetime.isocalendar()[1]
+
+    def get_date(self):
+        return self.tick_datetime.date()
 
     def __str__(self):
-        return self.date
+        return self.tick_datetime
 
 
 class Streak:
@@ -109,11 +112,19 @@ class Streak:
         """
         Mark today as ticked, but only if it is not already ticked
         """
+        # print the tick dates
+        for tick in self.ticks:
+            print(tick.get_date())
         today = datetime.datetime.now()
         today_tick = DailyTick(today.isoformat())
-        if today_tick not in self.ticks:
+        # check if today is already ticked
+        # match only the date part of the tick
+        if today_tick.get_date() not in [tick.get_date() for tick in self.ticks]:
+            print(tick.tick_datetime, today_tick.tick_datetime)
             self.ticks.append(today_tick)
             self.write_streak()
+        else:
+            print("Today is already ticked")
 
     def write_streak(self):
         """
@@ -127,7 +138,7 @@ class Streak:
             f.write("---\n")
             # write the ticks
             for tick in self.ticks:
-                f.write(f"{tick.date_str}\n")
+                f.write(f"{tick.tick_datetime_str}\n")
 
 
 class TerminalDisplay:
