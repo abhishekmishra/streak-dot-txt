@@ -2,6 +2,7 @@ import sys
 import os
 import dateutil.parser
 import datetime
+import click
 
 DEFAULT_STREAKS_DIR = "streaks"
 
@@ -218,37 +219,35 @@ class TerminalDisplay:
         print()
 
 
-if __name__ == "__main__":
-    print("streak.txt")
-
-    # Get the first argument if it exists
-    if len(sys.argv) > 1:
-        print(sys.argv[1])
-        # Check if it is a directory or a file that exists
-        if os.path.isdir(sys.argv[1]):
-            streak_folder = sys.argv[1]
-            print("The argument is a directory -> " + streak_folder)
-            sys.exit(1)
-        elif os.path.isfile(sys.argv[1]):
-            streak_file = sys.argv[1]
-            print("The argument is a file -> " + streak_file)
-            streak = Streak(streak_file)
-            command = "view"
-            if len(sys.argv) > 2:
-                command = sys.argv[2]
-            if command == "mark" or command == "tick":
-                streak.mark_today()
-            elif command == "view":
-                print("Streak name is [" + streak.name + "]")
-                print("Streak tick is [" + streak.tick + "]")
-                display = TerminalDisplay(streak)
-                display.display_streak_calendar()
-            else:
-                print("Command not recognized")
-                sys.exit(1)
+@click.command()
+@click.option("--dir", default=DEFAULT_STREAKS_DIR, help="Directory to store streaks")
+@click.option("--file", help="Streak file to view or mark")
+@click.option(
+    "--name",
+    help="Name of the streak (fuzzy matched, will fail if there are multiple matches or no matches)",
+)
+@click.argument("command", default="view", required=False)
+def streak_command(dir, file, name, command):
+    """
+    Streak command line tool
+    """
+    if file:
+        streak_file = file
+        streak = Streak(streak_file)
+        if command == "mark" or command == "tick":
+            streak.mark_today()
+        elif command == "view":
+            print("Streak name is [" + streak.name + "]")
+            print("Streak tick is [" + streak.tick + "]")
+            display = TerminalDisplay(streak)
+            display.display_streak_calendar()
         else:
-            print("The argument is not a directory or file")
+            print("Command not recognized")
             sys.exit(1)
     else:
-        print("No argument provided")
+        print("No file provided")
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    streak_command()

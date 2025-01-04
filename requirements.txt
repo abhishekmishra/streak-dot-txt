@@ -1,3 +1,4 @@
+click
 textual
 python-dateutil
 pyinstaller
