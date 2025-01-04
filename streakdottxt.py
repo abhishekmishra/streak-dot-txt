@@ -105,6 +105,30 @@ class Streak:
                 self.years.append(year)
         return self.years
 
+    def mark_today(self):
+        """
+        Mark today as ticked, but only if it is not already ticked
+        """
+        today = datetime.datetime.now()
+        today_tick = DailyTick(today.isoformat())
+        if today_tick not in self.ticks:
+            self.ticks.append(today_tick)
+            self.write_streak()
+
+    def write_streak(self):
+        """
+        Write the streak to the file
+        """
+        with open(self.streak_file, "w") as f:
+            # write the metadata
+            f.write("---\n")
+            for key, value in self.metadata.items():
+                f.write(f"{key}: {value}\n")
+            f.write("---\n")
+            # write the ticks
+            for tick in self.ticks:
+                f.write(f"{tick.date_str}\n")
+
 
 class TerminalDisplay:
     def __init__(self, streak):
@@ -196,16 +220,19 @@ if __name__ == "__main__":
             streak_file = sys.argv[1]
             print("The argument is a file -> " + streak_file)
             streak = Streak(streak_file)
-            print(streak.metadata)
-            print("Streak name is [" + streak.name + "]")
-            print("Streak tick is [" + streak.tick + "]")
-            print("Streak ticks are:")
-            for tick in streak.ticks:
-                print(tick.date)
-            print("Streak years are:")
-            print(streak.years)
-            display = TerminalDisplay(streak)
-            display.display_streak_calendar()
+            command = "view"
+            if len(sys.argv) > 2:
+                command = sys.argv[2]
+            if command == "mark":
+                streak.mark_today()
+            elif command == "view":
+                print("Streak name is [" + streak.name + "]")
+                print("Streak tick is [" + streak.tick + "]")
+                display = TerminalDisplay(streak)
+                display.display_streak_calendar()
+            else:
+                print("Command not recognized")
+                sys.exit(1)
         else:
             print("The argument is not a directory or file")
             sys.exit(1)
