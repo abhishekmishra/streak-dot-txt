@@ -1,4 +1,4 @@
 click
-textual
+rich
 python-dateutil
 pyinstaller

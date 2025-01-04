@@ -3,6 +3,8 @@ import os
 import dateutil.parser
 import datetime
 import click
+from rich.console import Console
+from rich.table import Table
 
 # Default directory to store streaks is "streaks" in the home directory
 DEFAULT_STREAKS_DIR = os.path.join(os.path.expanduser("~"), "streaks")
@@ -148,6 +150,7 @@ class Streak:
 class TerminalDisplay:
     def __init__(self, streak):
         self.streak = streak
+        self.console = Console()
 
     def display_streak_info(self):
         """
@@ -197,34 +200,37 @@ class TerminalDisplay:
         """
         Draw the month from first_day to last_day
         """
-        # get the month name
         month_name = first_day.strftime("%B")
-        # get the first day of the week
         first_weekday = first_day.weekday()
-        # get the number of days in the month
         num_days = (last_day - first_day).days + 1
 
-        # create a set of ticked days for the current month
         ticked_days = {
             tick.get_day()
             for tick in self.streak.ticks
             if tick.get_month() == first_day.month and tick.get_year() == first_day.year
         }
 
-        # draw the month
-        print(month_name)
-        print(" Sun  Mon  Tue  Wed  Thu  Fri  Sat ")
+        table = Table(title=month_name)
 
-        # print leading spaces for the first week
-        print("     " * first_weekday, end="")
+        table.add_column("Sun", justify="center")
+        table.add_column("Mon", justify="center")
+        table.add_column("Tue", justify="center")
+        table.add_column("Wed", justify="center")
+        table.add_column("Thu", justify="center")
+        table.add_column("Fri", justify="center")
+        table.add_column("Sat", justify="center")
 
+        week = [""] * first_weekday
         for day in range(1, num_days + 1):
-            current_day = first_day + datetime.timedelta(days=day - 1)
-            if current_day.weekday() == 0 and day != 1:
-                print()  # new line for new week
             day_display = "X" if day in ticked_days else "_"
-            print(f"{day:2} {day_display}", end=" ")
-        print()
+            week.append(f"{day:2} {day_display}")
+            if len(week) == 7:
+                table.add_row(*week)
+                week = []
+        if week:
+            table.add_row(*week)
+
+        self.console.print(table)
 
 
 @click.command()
