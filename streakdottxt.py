@@ -1,6 +1,7 @@
 import sys
 import os
 import dateutil.parser
+import datetime
 
 
 class DailyTick:
@@ -104,6 +105,76 @@ class Streak:
                 self.years.append(year)
         return self.years
 
+    def display_streak_calendar(self):
+        """
+        Display the streak calendar till today's date only for the current year.
+
+        The streak is displayed as a calendar on the terminal.
+
+        Every month is displayed in a grid with the days of a month as cells
+        and each line is a week.
+
+        Each cell has a day number and a flag X or empty to indicate if the day
+        is ticked or not.
+
+        The first line of the month display has the month name,
+        the second line has the days of the week, abbreviated to 3 letters.
+        and spaced such that they are centered in the cell.
+        """
+        current_date = datetime.datetime.now()
+        current_year = current_date.year
+        current_month = current_date.month
+        current_day = current_date.day
+
+        # get the first day of the year
+        first_day = datetime.datetime(current_year, 1, 1)
+        # get the last day of the streak is today
+        last_day = datetime.datetime(current_year, current_month, current_day)
+
+        # draw all the months till the current month
+        for month in range(1, current_month + 1):
+            # get the first day of the month
+            first_day = datetime.datetime(current_year, month, 1)
+            # get the last day of the month
+            last_day = datetime.datetime(
+                current_year, month + 1, 1
+            ) - datetime.timedelta(days=1)
+            # draw the month
+            self.draw_month(first_day, last_day)
+
+    def draw_month(self, first_day, last_day):
+        """
+        Draw the month from first_day to last_day
+        """
+        # get the month name
+        month_name = first_day.strftime("%B")
+        # get the first day of the week
+        first_weekday = first_day.weekday()
+        # get the number of days in the month
+        num_days = (last_day - first_day).days + 1
+
+        # create a set of ticked days for the current month
+        ticked_days = {
+            tick.get_day()
+            for tick in self.ticks
+            if tick.get_month() == first_day.month and tick.get_year() == first_day.year
+        }
+
+        # draw the month
+        print(month_name)
+        print(" Sun  Mon  Tue  Wed  Thu  Fri  Sat ")
+
+        # print leading spaces for the first week
+        print("     " * first_weekday, end="")
+
+        for day in range(1, num_days + 1):
+            current_day = first_day + datetime.timedelta(days=day - 1)
+            if current_day.weekday() == 0 and day != 1:
+                print()  # new line for new week
+            day_display = "X" if day in ticked_days else "_"
+            print(f"{day:2} {day_display}", end=" ")
+        print()
+
 
 if __name__ == "__main__":
     print("streak.txt")
@@ -128,6 +199,7 @@ if __name__ == "__main__":
                 print(tick.date)
             print("Streak years are:")
             print(streak.years)
+            streak.display_streak_calendar()
         else:
             print("The argument is not a directory or file")
             sys.exit(1)
