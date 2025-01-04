@@ -5,6 +5,7 @@ import datetime
 import click
 from rich.console import Console
 from rich.table import Table
+from rich import box
 
 # Default directory to store streaks is "streaks" in the home directory
 DEFAULT_STREAKS_DIR = os.path.join(os.path.expanduser("~"), "streaks")
@@ -213,7 +214,9 @@ class TerminalDisplay:
         Display all the information about the streak
         """
         self.display_streak_info()
+        print()
         self.display_streak_stats()
+        print()
         self.display_streak_calendar()
 
     def display_streak_info(self):
@@ -227,7 +230,7 @@ class TerminalDisplay:
         """
         Display the streak stats in a rich table
         """
-        table = Table(title="Streak Stats")
+        table = Table(title="Streak Stats", box=box.SIMPLE)
         table.add_column("Stat")
         table.add_column("Value")
 
@@ -291,7 +294,7 @@ class TerminalDisplay:
             if tick.get_month() == first_day.month and tick.get_year() == first_day.year
         }
 
-        table = Table(title=month_name + " " + str(year))
+        table = Table(title=month_name + " " + str(year), box=box.SIMPLE)
 
         table.add_column("Sun", justify="center")
         table.add_column("Mon", justify="center")
