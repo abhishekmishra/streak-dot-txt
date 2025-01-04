@@ -52,6 +52,13 @@ class Streak:
 
         self.ticks = []
         self.years = []
+        self.stats = {
+            "total_days": 0,
+            "ticked_days": 0,
+            "unticked_days": 0,
+            "current_streak": 0,
+            "longest_streak": 0,
+        }
 
         # read yaml front matter from the file if they exist
         self.read_metadata()
@@ -61,6 +68,9 @@ class Streak:
 
         # read the years from the ticks
         self.get_years()
+
+        # calculate the stats
+        self.calculate_stats()
 
     def read_metadata(self):
         with open(self.streak_file, "r") as f:
@@ -146,11 +156,57 @@ class Streak:
             for tick in self.ticks:
                 f.write(f"{tick.tick_datetime_str}\n")
 
+    def calculate_stats(self):
+        """
+        Calculate the stats for the streak
+
+        total_days - total days the streak has been active, first tick to current date
+        ticked_days - total days the streak has been ticked
+        unticked_days - total days the streak has not been ticked (total_days - ticked_days)
+        current_streak - current streak of ticked days
+        longest_streak - longest streak of ticked days
+        """
+        self.stats["total_days"] = (
+            datetime.datetime.now().date() - self.ticks[0].get_date()
+        ).days + 1
+        self.stats["ticked_days"] = len(self.ticks)
+        self.stats["unticked_days"] = (
+            self.stats["total_days"] - self.stats["ticked_days"]
+        )
+        self.stats["current_streak"] = 0
+        self.stats["longest_streak"] = 0
+
+        current_streak = 0
+        longest_streak = 0
+        for tick in self.ticks:
+            # if the tick is consecutive, increment the current streak
+            if (
+                current_streak == 0
+                or (tick.get_date() - last_tick.get_date()).days == 1
+            ):
+                current_streak += 1
+                if current_streak > longest_streak:
+                    longest_streak = current_streak
+            else:
+                current_streak = 1
+            last_tick = tick
+
+        self.stats["current_streak"] = current_streak
+        self.stats["longest_streak"] = longest_streak
+
 
 class TerminalDisplay:
     def __init__(self, streak):
         self.streak = streak
         self.console = Console()
+
+    def display_all(self):
+        """
+        Display all the information about the streak
+        """
+        self.display_streak_info()
+        self.display_streak_stats()
+        self.display_streak_calendar()
 
     def display_streak_info(self):
         """
@@ -158,6 +214,22 @@ class TerminalDisplay:
         """
         print("Name [" + self.streak.name + "]")
         print("Tick [" + self.streak.tick + "]")
+
+    def display_streak_stats(self):
+        """
+        Display the streak stats in a rich table
+        """
+        table = Table(title="Streak Stats")
+        table.add_column("Stat")
+        table.add_column("Value")
+
+        table.add_row("Total Days", str(self.streak.stats["total_days"]))
+        table.add_row("Ticked Days", str(self.streak.stats["ticked_days"]))
+        table.add_row("Unticked Days", str(self.streak.stats["unticked_days"]))
+        table.add_row("Current Streak", str(self.streak.stats["current_streak"]))
+        table.add_row("Longest Streak", str(self.streak.stats["longest_streak"]))
+
+        self.console.print(table)
 
     def display_streak_calendar(self):
         """
@@ -268,8 +340,7 @@ def streak_command(dir, file, name, command):
             streak.mark_today()
         elif command == "view":
             display = TerminalDisplay(streak)
-            display.display_streak_info()
-            display.display_streak_calendar()
+            display.display_all()
         else:
             print("Command not recognized")
             sys.exit(1)
@@ -291,8 +362,7 @@ def streak_command(dir, file, name, command):
                 streak.mark_today()
             elif command == "view":
                 display = TerminalDisplay(streak)
-                display.display_streak_info()
-                display.display_streak_calendar()
+                display.display_all()
             else:
                 print("Command not recognized")
                 sys.exit(1)
