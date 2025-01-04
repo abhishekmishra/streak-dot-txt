@@ -105,10 +105,6 @@ class Streak:
                 self.years.append(year)
         return self.years
 
-    def display_streak_calendar(self):
-        display = TerminalDisplay(self)
-        display.display_streak_calendar()
-
 
 class TerminalDisplay:
     def __init__(self, streak):
@@ -208,7 +204,8 @@ if __name__ == "__main__":
                 print(tick.date)
             print("Streak years are:")
             print(streak.years)
-            streak.display_streak_calendar()
+            display = TerminalDisplay(streak)
+            display.display_streak_calendar()
         else:
             print("The argument is not a directory or file")
             sys.exit(1)
