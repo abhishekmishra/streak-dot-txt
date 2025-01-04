@@ -333,41 +333,34 @@ def streak_command(dir, file, name, command):
     """
     Streak command line tool
     """
-    if file:
-        streak_file = file
-        streak = Streak(streak_file)
-        if command == "mark" or command == "tick":
-            streak.mark_today()
-        elif command == "view":
-            display = TerminalDisplay(streak)
-            display.display_all()
-        else:
-            print("Command not recognized")
-            sys.exit(1)
-    elif name:
-        # get the list of files in the directory
-        files = os.listdir(dir)
-        # fuzzy match the name
-        matches = [f for f in files if name in f]
-        if len(matches) == 0:
-            print("No streaks found")
-            sys.exit(1)
-        elif len(matches) > 1:
-            print("Multiple streaks found")
-            sys.exit(1)
-        else:
-            streak_file = os.path.join(dir, matches[0])
-            streak = Streak(streak_file)
-            if command == "mark" or command == "tick":
-                streak.mark_today()
-            elif command == "view":
-                display = TerminalDisplay(streak)
-                display.display_all()
-            else:
-                print("Command not recognized")
+
+    def get_streak_from_file_or_name(file, name):
+        if file:
+            return Streak(file)
+        elif name:
+            files = os.listdir(dir)
+            matches = [f for f in files if name in f]
+            if len(matches) == 0:
+                print("No streaks found")
                 sys.exit(1)
+            elif len(matches) > 1:
+                print("Multiple streaks found")
+                sys.exit(1)
+            else:
+                return Streak(os.path.join(dir, matches[0]))
+        else:
+            print("No file provided")
+            sys.exit(1)
+
+    if command == "mark" or command == "tick":
+        streak = get_streak_from_file_or_name(file, name)
+        streak.mark_today()
+    elif command == "view":
+        streak = get_streak_from_file_or_name(file, name)
+        display = TerminalDisplay(streak)
+        display.display_all()
     else:
-        print("No file provided")
+        print("Command not recognized")
         sys.exit(1)
 
 
