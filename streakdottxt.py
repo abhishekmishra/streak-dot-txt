@@ -201,6 +201,7 @@ class TerminalDisplay:
         Draw the month from first_day to last_day
         """
         month_name = first_day.strftime("%B")
+        year = first_day.year
         first_weekday = first_day.weekday()
         num_days = (last_day - first_day).days + 1
 
@@ -210,7 +211,7 @@ class TerminalDisplay:
             if tick.get_month() == first_day.month and tick.get_year() == first_day.year
         }
 
-        table = Table(title=month_name)
+        table = Table(title=month_name + " " + str(year))
 
         table.add_column("Sun", justify="center")
         table.add_column("Mon", justify="center")
