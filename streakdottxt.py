@@ -221,9 +221,17 @@ class TerminalDisplay:
         table.add_column("Sat", justify="center")
 
         week = [""] * first_weekday
+        current_date = datetime.datetime.now().date()
         for day in range(1, num_days + 1):
-            day_display = "X" if day in ticked_days else "_"
-            week.append(f"{day:2} {day_display}")
+            day_date = datetime.date(first_day.year, first_day.month, day)
+            if day_date > current_date:
+                day_display = f"[on dark_gray]{day:2} [-][/]"
+            else:
+                if day in ticked_days:
+                    day_display = f"[on green]{day:2} [✓][/]"
+                else:
+                    day_display = f"[on red]{day:2} [✖][/]"
+            week.append(day_display)
             if len(week) == 7:
                 table.add_row(*week)
                 week = []
