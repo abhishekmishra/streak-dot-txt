@@ -115,6 +115,7 @@ if __name__ == "__main__":
         if os.path.isdir(sys.argv[1]):
             streak_folder = sys.argv[1]
             print("The argument is a directory -> " + streak_folder)
+            sys.exit(1)
         elif os.path.isfile(sys.argv[1]):
             streak_file = sys.argv[1]
             print("The argument is a file -> " + streak_file)
@@ -129,7 +130,7 @@ if __name__ == "__main__":
             print(streak.years)
         else:
             print("The argument is not a directory or file")
-            exit(1)
+            sys.exit(1)
     else:
         print("No argument provided")
-        exit(1)
+        sys.exit(1)
