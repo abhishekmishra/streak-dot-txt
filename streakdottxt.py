@@ -166,6 +166,14 @@ class Streak:
         current_streak - current streak of ticked days
         longest_streak - longest streak of ticked days
         """
+        if not self.ticks:
+            self.stats["total_days"] = 0
+            self.stats["ticked_days"] = 0
+            self.stats["unticked_days"] = 0
+            self.stats["current_streak"] = 0
+            self.stats["longest_streak"] = 0
+            return
+
         self.stats["total_days"] = (
             datetime.datetime.now().date() - self.ticks[0].get_date()
         ).days + 1
