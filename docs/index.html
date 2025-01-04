@@ -1,11 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Streak.txt - capture your streaks.</title>
-</head>
-<body>
-    tbd
-</body>
+
+    <style>
+      /* 
+      Table styling
+      Cells are left aligned,
+      header has a bottom border,
+      simple padding for cells
+      */
+      .version-history {
+        border-collapse: collapse;
+        margin: 2px;
+        padding: 0px;
+      }
+
+      .version-history th {
+        text-align: left;
+        border-bottom: 1px solid black;
+        padding: 8px;
+      }
+
+      .version-history td {
+        text-align: left;
+        padding: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Streak.txt</h1>
+    <b>Table of Contents</b>
+    <ul>
+      <li>
+        <a href="#intro">Introduction</a>
+      </li>
+      <li>
+        <a href="#usage">Usage</a>
+        <ul>
+          <li>
+            <a href="#entries">Entries</a>
+          </li>
+          <li>
+            <a href="#streak-name">Streak Name</a>
+          </li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="#project">Project</a>
+        <ul>
+          <li>
+            <a href="#license">License</a>
+          </li>
+          <li>
+            <a href="#source">Source Code</a>
+          </li>
+          <li>
+            <a href="#goals">Project Goals</a>
+          </li>
+        </ul>
+      </li>
+      
+      <li>
+        <a href="#history">History of this page</a>
+      </li>
+    </ul>
+    <h2 id="intro">Introduction</h2>
+    <p>
+      Streak.txt is a simple tool to capture your streaks. Each streak is
+      tracked in a plain text file that you can edit with your favourite text
+      editor. You can use it to capture your streaks, habits, or anything else
+      you want to track.
+    </p>
+
+    <i>
+      To organize the streaks better you can keep all your streak files in a
+      "streaks" directory however this is not a requirement.
+    </i>
+
+    <h2 id="usage">Usage</h2>
+    <p>
+      To use Streak.txt, simply create a new plain text file in your favorite
+      text editor and start capturing your streaks.
+    </p>
+    <p>
+      <b>
+        Suggestion #1: name your streak file "streak-&lt;activity&gt;.txt", for
+        example streak-jumpingjacks.txt
+      </b>
+    </p>
+    <p>
+      <b>
+        Suggestion #2: keep all your streak files in one directory. The
+        reference tool assumes your default streak files folder is "~/streaks"
+      </b>
+    </p>
+    <p>
+      Each line in the file represents a day. You can use any text editor to
+      edit the file, including Notepad, TextEdit, or any other text editor.
+    </p>
+
+    <h3 id="entries">Entries</h3>
+    <div>
+      <p>
+        Each day you complete the task, add the date to the file. For example:
+      </p>
+
+      <pre>
+2021-01-01
+2021-01-03
+2021-01-04
+    </pre
+      >
+
+      <p>
+        You can see in the example above that the task was completed on January
+        1st, 3rd, and 4th, but not on January 2nd.
+      </p>
+
+      <p>
+        <b> Note: The date is in ISO 8601 format (YYYY-MM-DD). </b>
+      </p>
+    </div>
+
+    <h3 id="streak-name">Streak Name</h3>
+
+    <p>
+      If you want to give a nice name to your streak, you can add a metadata
+      block at the beginning of the file. The metadata block is a YAML front
+      matter block. Here is an example:
+    </p>
+    <pre>
+---
+name: Jumping Jacks
+---
+2021-01-01
+2021-01-03
+2021-01-04
+    </pre>
+
+    <div id="project">
+      <h2>Project</h2>
+
+      <p>
+        The project contains the source code for the reference tool as well as
+        the documentation (this page) which defines the format.
+      </p>
+
+      <div id="license">
+        <h3>License</h3>
+        <p>
+          The project (documentation and the reference implementation) is
+          licensed under the MIT License. You can find the license in the source
+          code repository.
+        </p>
+      </div>
+
+      <div id="source">
+        <h3>Source Code</h3>
+        <p>
+          Source code repository
+          <a href="https://github.com/abhishekmishra/streak-dot-txt"
+            >streak-dot-txt (Github)</a
+          >.
+        </p>
+      </div>
+      <div id="goals">
+        <h3>Project Goals</h3>
+        <ol>
+          <li>Track one streak per file.</li>
+          <li>Changes to file are append only.</li>
+          <li>Each streak file has some metadata.</li>
+          <li>We can specify a name for the streak such as "Draw daily".</li>
+          <li>
+            We can specify the period of the streak such as "Monthly" or
+            "Weekly".
+          </li>
+          <li>
+            We can specify the tick of the streak such as "Daily" or "Hourly".
+            The tick has to be a smaller time measure than the period.
+          </li>
+          <li>
+            We can specify the expected frequency of the streak such as "10
+            times", "7 times" etc.
+          </li>
+          <li>
+            No entry is required when task is not done. In fact a missing entry
+            qualifies as "Not done".
+          </li>
+          <li>
+            We can specify an optional quantity when making an entry when task
+            is done.
+          </li>
+          <li>We can specify an optional comment when making an entry.</li>
+          <li>The comment can contain hyperlinks.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div id="history">
+      <h2>History of this page</h2>
+      <table class="version-history">
+        <tr>
+          <th>Date</th>
+          <th>Changes</th>
+          <th>Author</th>
+        </tr>
+        <tr>
+          <td>2025-01-05</td>
+          <td>Initial version</td>
+          <td>Abhishek (<a href="https://neolateral.in">neolateral.in</a>)</td>
+        </tr>
+      </table>
+    </div>
+  </body>
 </html>
