@@ -3,6 +3,8 @@ import os
 import dateutil.parser
 import datetime
 
+DEFAULT_STREAKS_DIR = "streaks"
+
 
 class DailyTick:
     def __init__(self, tick_datetime_str):
