@@ -330,7 +330,17 @@ class TerminalDisplay:
         self.console.print(table)
 
 
-@click.command()
+@click.command(
+    help="""
+    The streak command line tool helps you keep track of your daily streaks.\n
+    It follows the "streak.txt" file format as documented in the docs/index.html.\n
+    The command decides what the tool does. The possible commands are\n
+    - view (default): View the streak\n
+    - new: Create a new streak\n
+    - mark (alias tick): Mark today's tick\n
+    - list: List all the streaks in the directory
+    """
+)
 @click.option("--dir", default=DEFAULT_STREAKS_DIR, help="Directory to store streaks")
 @click.option("--file", help="Streak file to view or mark")
 @click.option(
@@ -339,7 +349,11 @@ class TerminalDisplay:
     (fuzzy matched, will fail if there are multiple matches or no matches)
     If the file is specified, this option is ignored""",
 )
-@click.argument("command", default="view", required=False)
+@click.argument(
+    "command",
+    default="view",
+    required=False,
+)
 def streak_command(dir, file, name, command):
     """
     Streak command line tool
