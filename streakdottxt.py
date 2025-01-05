@@ -382,6 +382,37 @@ def streak_command(dir, file, name, command):
             with open(streak_file, "w") as f:
                 f.write(f"---\nname: {name}\ntick: Daily\n---\n")
             print(f"Streak '{name}' created")
+    elif command == "list":
+        files = os.listdir(dir)
+        streak_files = [
+            f for f in files if f.startswith("streak-") and f.endswith(".txt")
+        ]
+        if streak_files:
+            table = Table(title="Streaks", box=box.SIMPLE)
+            table.add_column("Name")
+            table.add_column("Tick")
+            table.add_column("Current Streak")
+            table.add_column("Today's Status")
+
+            for streak_file in streak_files:
+                streak = Streak(os.path.join(dir, streak_file))
+                today = datetime.datetime.now().date()
+                today_status = (
+                    "Ticked"
+                    if any(tick.get_date() == today for tick in streak.ticks)
+                    else "Not Ticked"
+                )
+                table.add_row(
+                    streak.name,
+                    streak.tick,
+                    str(streak.stats["current_streak"]),
+                    today_status,
+                )
+
+            console = Console()
+            console.print(table)
+        else:
+            print("No streaks found")
     else:
         print("Command not recognized")
         sys.exit(1)
