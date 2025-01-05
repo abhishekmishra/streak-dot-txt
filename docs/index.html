@@ -50,6 +50,18 @@
       </li>
 
       <li>
+        <a href="#tool">Streakdottxt - Reference Tool</a>
+        <ul>
+          <li>
+            <a href="#installation">Installation</a>
+          </li>
+          <li>
+            <a href="#commands">Commands</a>
+          </li>
+        </ul>
+      </li>
+
+      <li>
         <a href="#project">Project</a>
         <ul>
           <li>
@@ -63,7 +75,7 @@
           </li>
         </ul>
       </li>
-      
+
       <li>
         <a href="#history">History of this page</a>
       </li>
@@ -141,6 +153,61 @@ name: Jumping Jacks
 2021-01-03
 2021-01-04
     </pre>
+
+    <div id="tool">
+      <h2>Streakdottxt - Reference Tool</h2>
+      <p>
+        The reference tool is a simple command line tool that can be used to
+        manage your streaks. The tool is written in Python and is available on
+        Github.
+      </p>
+      <p>It serves two purposes:</p>
+      <ol>
+        <li>
+          Reference implementation: Clarifies the file format, especially any
+          undocumented decisions which might later becom part of the file
+          format.
+        </li>
+        <li>
+          Utility: Provides a simple command line interface to manage your
+          streaks.
+        </li>
+      </ol>
+
+      <div id="installation">
+        <h3>Installation</h3>
+        <p>
+          The tool is available on Github. You can clone the repository and run
+          the tool from the command line.
+        </p>
+        <pre>
+git clone TBD: add repo link
+cd streak-dot-txt
+pip install -r requirements.txt
+python streakdottxt.py --help
+        </pre>
+      </div>
+
+      <div id="commands">
+        <h3>Commands</h3>
+        <p>
+          The tool provides the following commands. You can get more information
+          about each command by running the command with the "--help" flag.
+        </p>
+        <ul>
+          <li>
+            <b>list</b>: List all the streak files in the streaks directory.
+          </li>
+          <li>
+            <b>view (Default)</b>: Show the streak details for the streak given
+            by the file or name option.
+          </li>
+          <li>
+            <b>tick</b>: Add a tick to the streak file marking today's date.
+          </li>
+        </ul>
+      </div>
+    </div>
 
     <div id="project">
       <h2>Project</h2>
