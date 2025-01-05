@@ -19,6 +19,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
+"""
+streakdottxt.py - Reference implementation of the streak.txt format.
+A command line tool to manage daily streaks all stored in text files.
+
+author: Abhishek Mishra
+date: 05/01/2025
+"""
 import sys
 import os
 import dateutil.parser
@@ -33,6 +41,12 @@ DEFAULT_STREAKS_DIR = os.path.join(os.path.expanduser("~"), "streaks")
 
 
 class DailyTick:
+    """
+    DailyTick class represents a tick for a daily streak.
+    It has a tick_datetime_str which is the date in ISO8601 format
+    and a tick_datetime which is a datetime object parsed from the tick_datetime_str
+    """
+
     def __init__(self, tick_datetime_str):
         self.tick_datetime_str = tick_datetime_str
         # parse ISO8601 date using dateutil.parser
@@ -66,6 +80,13 @@ class DailyTick:
 
 
 class Streak:
+    """
+    Streak class represents a streak.
+
+    It has a streak_file which is the file where the streak is stored.
+    The metadata (name and tick), the ticks, and the stats are read from the file.
+    """
+
     def __init__(self, streak_file):
         self.streak_file = streak_file
         self.metadata = {}
@@ -226,6 +247,10 @@ class Streak:
 
 
 class TerminalDisplay:
+    """
+    TerminalDisplay class is used to display the streak information on the terminal.
+    """
+
     def __init__(self, streak):
         self.streak = streak
         self.console = Console()
