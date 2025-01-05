@@ -1,20 +1,37 @@
-# streak.txt
-We define a  simple file format for managing streaks (and gaps) of repeated
-occurences. This format has similar goals as the todo.txt file format.
+# Streak.txt
 
-## Goals of the project
+If you 🫵 also repeat certain mundane tasks daily as part of a practice or routine and want to track it in the simplest possible way, you're at the right place! 
 
-1. Track one streak per file.
-1. Changes to file are append only.
-1. Each streak file has some metadata.
-1. We can specify a name for the streak such as "Draw daily".
-1. We can specify the period of the streak such as "Monthly" or "Weekly".
-1. We can specify the tick of the streak such as "Daily" or "Hourly". The tick
-   has to be a smaller time measure than the period.
-1. We can specify the expected frequency of the streak such as "10 times", "7
-   times" etc.
-1. No entry is required when task is not done. In fact a missing entry qualifies
-   as "Not done".
-1. We can specify an optional quantity when making an entry when task is done.
-1. We can specify an optional comment when making an entry.
-1. The comment can contain hyperlinks.
+> What about your vomit streak? Jerry Seinfeld : I know! I haven't thrown up since June 29, 1980!
+> 
+> [Jerry Seinfeld - The Dinner Party](https://www.imdb.com/title/tt0697684/characters/nm0000632#:~:text=What%20about%20your%20vomit%20streak,up%20since%20June%2029%2C%201980!)
+
+*Streak.txt* is a simple file format to track streaks (or lack thereof) of repeated tasks. Something like this -> 
+✅✅✅⛔✅⛔✅
+
+All your streaks are in future-proof plain text files on your disk. If you complete a task today append its date, if you didn't then don't enter anything.
+
+Here's a sample:
+(notice the miss on 2nd Jan 2025)
+
+```
+---
+name: Jumping Jacks
+---
+2021-01-01
+2021-01-03
+2021-01-04
+```
+
+## Getting started
+
+```
+git clone https://github.com/abhishekmishra/streak-dot-txt.git
+cd streak-dot-txt
+pip install -r requirements.txt
+python streakdottxt.py --help
+```
+
+## Docs
+
+Details about the file format and usage of the tool are here [Streak.txt Docs](https://abhishekmishra.github.io/streak-dot-txt/)
