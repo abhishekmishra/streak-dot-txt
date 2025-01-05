@@ -137,7 +137,7 @@ class Streak:
         # check if today is already ticked
         # match only the date part of the tick
         if today_tick.get_date() not in [tick.get_date() for tick in self.ticks]:
-            print(tick.tick_datetime, today_tick.tick_datetime)
+            print("Adding today's tick :", today_tick.tick_datetime)
             self.ticks.append(today_tick)
             self.write_streak()
         else:
