@@ -197,13 +197,59 @@ python streakdottxt.py --help
         <ul>
           <li>
             <b>list</b>: List all the streak files in the streaks directory.
+            <pre>python streakdottxt.py list</pre>
+            <pre>
+Streaks                                 
+
+Name                          Tick    Current Streak   Today's Status 
+───────────────────────────────────────────────────────────────────────
+Gesture Drawing Practice      Daily   1                Ticked
+Journal Entry                 Daily   4                Not Ticked
+Jumping Jacks                 Daily   1                Ticked
+Practice Digital Art          Daily   0                Not Ticked
+Practice Figure Drawing       Daily   1                Ticked
+Practice Landscape Drawing    Daily   0                Not Ticked
+Practice Portrait Drawing     Daily   1                Ticked
+Practice Still Life Drawing   Daily   1                Ticked
+Programming/Coding            Daily   1                Ticked
+            </pre>
+          </li>
+          <li>
+            <b>new</b>: Create a new streak file with the given name.
+            <pre>python streakdottxt.py new --name "Jumping Jacks"</pre>            
           </li>
           <li>
             <b>view (Default)</b>: Show the streak details for the streak given
             by the file or name option.
+            <pre>python streakdottxt.py view --name jumping</pre>
+            <pre>
+Name [Jumping Jacks]
+Tick [Daily]
+
+        Streak Stats       
+
+    Stat             Value 
+    ────────────────────────
+    Total Days       1
+    Ticked Days      1
+    Unticked Days    0
+    Current Streak   1
+    Longest Streak   1
+
+
+                            January 2025                          
+
+    Sun      Mon      Tue      Wed      Thu      Fri      Sat   
+    ──────────────────────────────────────────────────────────────
+                        1 [✖]    2 [✖]    3 [✖]    4 [✖]    5 [✓]
+    6 [-]    7 [-]    8 [-]    9 [-]   10 [-]   11 [-]   12 [-]
+    13 [-]   14 [-]   15 [-]   16 [-]   17 [-]   18 [-]   19 [-]
+    20 [-]   21 [-]   22 [-]   23 [-]   24 [-]   25 [-]   26 [-]
+    27 [-]   28 [-]   29 [-]   30 [-]   31 [-]                
           </li>
           <li>
             <b>tick</b>: Add a tick to the streak file marking today's date.
+            <pre>python streakdottxt.py tick --name jumping</pre>
           </li>
         </ul>
       </div>
