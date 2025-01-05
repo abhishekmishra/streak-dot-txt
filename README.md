@@ -1,6 +1,6 @@
 # Streak.txt
 
-If you 🫵 also repeat certain mundane tasks daily as part of a practice or routine and want to track it in the simplest possible way, you're at the right place! 
+If you 🫵 too repeat certain mundane tasks daily as part of a practice or routine and want to track it in the simplest possible way, you're at the right place! 
 
 > What about your vomit streak? Jerry Seinfeld : I know! I haven't thrown up since June 29, 1980!
 > 
