@@ -388,8 +388,9 @@ class TerminalDisplay:
     """
 )
 @click.option("--dir", default=DEFAULT_STREAKS_DIR, help="Directory to store streaks")
-@click.option("--file", help="Streak file to view or mark")
+@click.option("-f", "--file", help="Streak file to view or mark")
 @click.option(
+    "-n",
     "--name",
     help="""Name of the streak 
     (fuzzy matched, will fail if there are multiple matches or no matches)
