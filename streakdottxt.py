@@ -376,108 +376,104 @@ class TerminalDisplay:
         self.console.print(table)
 
 
-@click.command(
-    help="""
-    The streak command line tool helps you keep track of your daily streaks.\n
-    It follows the "streak.txt" file format as documented in the docs/index.html.\n
-    The command decides what the tool does. The possible commands are\n
-    - view (default): View the streak\n
-    - new: Create a new streak\n
-    - mark (alias tick): Mark today's tick\n
-    - list: List all the streaks in the directory
-    """
+@click.group(
+    help="The streak command line tool helps you keep track of your daily streaks."
 )
 @click.option("--dir", default=DEFAULT_STREAKS_DIR, help="Directory to store streaks")
-@click.option("-f", "--file", help="Streak file to view or mark")
-@click.option(
-    "-n",
-    "--name",
-    help="""Name of the streak 
-    (fuzzy matched, will fail if there are multiple matches or no matches)
-    If the file is specified, this option is ignored""",
-)
-@click.argument(
-    "command",
-    default="view",
-    required=False,
-)
-def streak_command(dir, file, name, command):
-    """
-    Streak command line tool
-    """
+@click.pass_context
+def streakdottxt(ctx, dir):
+    ctx.ensure_object(dict)
+    ctx.obj["dir"] = dir
 
-    def get_streak_from_file_or_name(file, name):
-        if file:
-            return Streak(file)
-        elif name:
-            files = os.listdir(dir)
-            matches = [f for f in files if name in f]
-            if len(matches) == 0:
-                print("No streaks found")
-                sys.exit(1)
-            elif len(matches) > 1:
-                print("Multiple streaks found")
-                sys.exit(1)
-            else:
-                return Streak(os.path.join(dir, matches[0]))
-        else:
-            print("No file provided")
-            sys.exit(1)
 
-    if command == "mark" or command == "tick":
-        streak = get_streak_from_file_or_name(file, name)
-        streak.mark_today()
-    elif command == "view":
-        streak = get_streak_from_file_or_name(file, name)
-        display = TerminalDisplay(streak)
-        display.display_all()
-    elif command == "new":
-        if not name:
-            print("Name is required for creating a new streak")
-            sys.exit(1)
-        name_in_path = name.replace(" ", "-").lower()
-        streak_file = os.path.join(dir, f"streak-{name_in_path}.txt")
-        if os.path.exists(streak_file):
-            print("Streak already exists")
-        else:
-            with open(streak_file, "w") as f:
-                f.write(f"---\nname: {name}\ntick: Daily\n---\n")
-            print(f"Streak '{name}' created")
-    elif command == "list":
-        files = os.listdir(dir)
-        streak_files = [
-            f for f in files if f.startswith("streak-") and f.endswith(".txt")
-        ]
-        if streak_files:
-            table = Table(title="Streaks", box=box.SIMPLE)
-            table.add_column("Name")
-            table.add_column("Tick")
-            table.add_column("Current Streak")
-            table.add_column("Today's Status")
+@streakdottxt.command(help="View the streak")
+@click.option("-f", "--file", help="Streak file to view")
+@click.option("-n", "--name", help="Name of the streak (fuzzy matched)")
+@click.pass_context
+def view(ctx, file, name):
+    dir = ctx.obj["dir"]
+    streak = get_streak_from_file_or_name(dir, file, name)
+    display = TerminalDisplay(streak)
+    display.display_all()
 
-            for streak_file in streak_files:
-                streak = Streak(os.path.join(dir, streak_file))
-                today = datetime.datetime.now().date()
-                today_status = (
-                    "Ticked"
-                    if any(tick.get_date() == today for tick in streak.ticks)
-                    else "Not Ticked"
-                )
-                table.add_row(
-                    streak.name,
-                    streak.tick,
-                    str(streak.stats["current_streak"]),
-                    today_status,
-                )
 
-            console = Console()
-            console.print(table)
-        else:
-            print("No streaks found")
+@streakdottxt.command(help="Mark today's tick")
+@click.option("-f", "--file", help="Streak file to mark")
+@click.option("-n", "--name", help="Name of the streak (fuzzy matched)")
+@click.pass_context
+def mark(ctx, file, name):
+    dir = ctx.obj["dir"]
+    streak = get_streak_from_file_or_name(dir, file, name)
+    streak.mark_today()
+
+
+@streakdottxt.command(help="Create a new streak")
+@click.option("-n", "--name", required=True, help="Name of the new streak")
+@click.pass_context
+def new(ctx, name):
+    dir = ctx.obj["dir"]
+    name_in_path = name.replace(" ", "-").lower()
+    streak_file = os.path.join(dir, f"streak-{name_in_path}.txt")
+    if os.path.exists(streak_file):
+        print("Streak already exists")
     else:
-        print("Command not recognized")
+        with open(streak_file, "w") as f:
+            f.write(f"---\nname: {name}\ntick: Daily\n---\n")
+        print(f"Streak '{name}' created")
+
+
+@streakdottxt.command(help="List all the streaks in the directory")
+@click.pass_context
+def list(ctx):
+    dir = ctx.obj["dir"]
+    files = os.listdir(dir)
+    streak_files = [f for f in files if f.startswith("streak-") and f.endswith(".txt")]
+    if streak_files:
+        table = Table(title="Streaks", box=box.SIMPLE)
+        table.add_column("Name")
+        table.add_column("Tick")
+        table.add_column("Current Streak")
+        table.add_column("Today's Status")
+
+        for streak_file in streak_files:
+            streak = Streak(os.path.join(dir, streak_file))
+            today = datetime.datetime.now().date()
+            today_status = (
+                "Ticked"
+                if any(tick.get_date() == today for tick in streak.ticks)
+                else "Not Ticked"
+            )
+            table.add_row(
+                streak.name,
+                streak.tick,
+                str(streak.stats["current_streak"]),
+                today_status,
+            )
+
+        console = Console()
+        console.print(table)
+    else:
+        print("No streaks found")
+
+
+def get_streak_from_file_or_name(dir, file, name):
+    if file:
+        return Streak(file)
+    elif name:
+        files = os.listdir(dir)
+        matches = [f for f in files if name in f]
+        if len(matches) == 0:
+            print("No streaks found")
+            sys.exit(1)
+        elif len(matches) > 1:
+            print("Multiple streaks found")
+            sys.exit(1)
+        else:
+            return Streak(os.path.join(dir, matches[0]))
+    else:
+        print("No file provided")
         sys.exit(1)
 
 
 if __name__ == "__main__":
-    streak_command()
+    streakdottxt()
