@@ -172,8 +172,8 @@ class Streak:
         Mark today as ticked, but only if it is not already ticked
         """
         # print the tick dates
-        for tick in self.ticks:
-            print(tick.get_date())
+        # for tick in self.ticks:
+        #     print(tick.get_date())
         today = datetime.datetime.now()
         today_tick = DailyTick(today.isoformat())
         # check if today is already ticked
