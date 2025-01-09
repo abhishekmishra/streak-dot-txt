@@ -397,14 +397,27 @@ def view(ctx, file, name):
     display.display_all()
 
 
+def mark_streak(dir, file, name):
+    streak = get_streak_from_file_or_name(dir, file, name)
+    streak.mark_today()
+
+
 @streakdottxt.command(help="Mark today's tick")
 @click.option("-f", "--file", help="Streak file to mark")
 @click.option("-n", "--name", help="Name of the streak (fuzzy matched)")
 @click.pass_context
 def mark(ctx, file, name):
     dir = ctx.obj["dir"]
-    streak = get_streak_from_file_or_name(dir, file, name)
-    streak.mark_today()
+    mark_streak(dir, file, name)
+
+
+@streakdottxt.command(help="Tick today's tick (same as mark)")
+@click.option("-f", "--file", help="Streak file to tick")
+@click.option("-n", "--name", help="Name of the streak (fuzzy matched)")
+@click.pass_context
+def tick(ctx, file, name):
+    dir = ctx.obj["dir"]
+    mark_streak(dir, file, name)
 
 
 @streakdottxt.command(help="Create a new streak")
