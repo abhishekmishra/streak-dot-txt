@@ -399,6 +399,8 @@ def view(ctx, file, name):
 
 def mark_streak(dir, file, name):
     streak = get_streak_from_file_or_name(dir, file, name)
+    # print the streak name
+    print("Streak:", streak.name)
     streak.mark_today()
 
 
