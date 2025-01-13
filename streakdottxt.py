@@ -453,6 +453,7 @@ def list(ctx):
         table = Table(title="Streaks", box=box.SIMPLE)
         table.add_column("Name")
         table.add_column("Tick")
+        table.add_column("Longest Streak")
         table.add_column("Current Streak")
         table.add_column("Today's Status")
 
@@ -467,6 +468,7 @@ def list(ctx):
             table.add_row(
                 streak.name,
                 streak.tick,
+                str(streak.stats["longest_streak"]),
                 str(streak.stats["current_streak"]),
                 today_status,
             )
