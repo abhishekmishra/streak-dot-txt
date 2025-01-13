@@ -229,18 +229,24 @@ class Streak:
 
         current_streak = 0
         longest_streak = 0
-        for tick in self.ticks:
-            # if the tick is consecutive, increment the current streak
-            if (
-                current_streak == 0
-                or (tick.get_date() - last_tick.get_date()).days == 1
-            ):
-                current_streak += 1
+        today = datetime.datetime.now().date()
+        tick_dates = {tick.get_date() for tick in self.ticks}
+        last_tick_date = None
+
+        for single_date in (
+            self.ticks[0].get_date() + datetime.timedelta(n)
+            for n in range(self.stats["total_days"])
+        ):
+            if single_date in tick_dates:
+                if last_tick_date is None or (single_date - last_tick_date).days == 1:
+                    current_streak += 1
+                else:
+                    current_streak = 1
                 if current_streak > longest_streak:
                     longest_streak = current_streak
+                last_tick_date = single_date
             else:
-                current_streak = 1
-            last_tick = tick
+                current_streak = 0
 
         self.stats["current_streak"] = current_streak
         self.stats["longest_streak"] = longest_streak
