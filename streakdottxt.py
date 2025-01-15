@@ -295,7 +295,7 @@ class TerminalDisplay:
         table.add_row("Unticked Days", str(self.streak.stats["unticked_days"]))
         table.add_row("Current Streak", str(self.streak.stats["current_streak"]))
         table.add_row("Longest Streak", str(self.streak.stats["longest_streak"]))
-        table.add_row("Tick Average", f"{self.streak.stats['tick_average']:.1f}")
+        table.add_row("Tick Average", f"{self.streak.stats['tick_average'] * 100:.0f}%")
 
         self.console.print(table)
 
@@ -476,8 +476,7 @@ def list(ctx):
                 streak.tick,
                 str(streak.stats["longest_streak"]),
                 str(streak.stats["current_streak"]),
-                # format tick average to one decimal place
-                f"{streak.stats['tick_average']:.1f}",
+                f"{streak.stats['tick_average'] * 100:.0f}%",
                 today_status,
             )
 
