@@ -215,6 +215,7 @@ class Streak:
             self.stats["unticked_days"] = 0
             self.stats["current_streak"] = 0
             self.stats["longest_streak"] = 0
+            self.stats["tick_average"] = 0
             return
 
         self.stats["total_days"] = (
@@ -250,6 +251,9 @@ class Streak:
 
         self.stats["current_streak"] = current_streak
         self.stats["longest_streak"] = longest_streak
+        self.stats["tick_average"] = (
+            self.stats["ticked_days"] / self.stats["total_days"]
+        )
 
 
 class TerminalDisplay:
@@ -291,6 +295,7 @@ class TerminalDisplay:
         table.add_row("Unticked Days", str(self.streak.stats["unticked_days"]))
         table.add_row("Current Streak", str(self.streak.stats["current_streak"]))
         table.add_row("Longest Streak", str(self.streak.stats["longest_streak"]))
+        table.add_row("Tick Average", f"{self.streak.stats['tick_average']:.1f}")
 
         self.console.print(table)
 
@@ -455,6 +460,7 @@ def list(ctx):
         table.add_column("Tick")
         table.add_column("Longest Streak")
         table.add_column("Current Streak")
+        table.add_column("Tick Average")
         table.add_column("Today's Status")
 
         for streak_file in streak_files:
@@ -470,6 +476,8 @@ def list(ctx):
                 streak.tick,
                 str(streak.stats["longest_streak"]),
                 str(streak.stats["current_streak"]),
+                # format tick average to one decimal place
+                f"{streak.stats['tick_average']:.1f}",
                 today_status,
             )
 
