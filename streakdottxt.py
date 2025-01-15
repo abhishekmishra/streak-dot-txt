@@ -461,15 +461,13 @@ def list(ctx):
         table.add_column("Longest Streak")
         table.add_column("Current Streak")
         table.add_column("Tick Average")
-        table.add_column("Today's Status")
+        table.add_column("Today")
 
         for streak_file in streak_files:
             streak = Streak(os.path.join(dir, streak_file))
             today = datetime.datetime.now().date()
             today_status = (
-                "Ticked"
-                if any(tick.get_date() == today for tick in streak.ticks)
-                else "Not Ticked"
+                "✓" if any(tick.get_date() == today for tick in streak.ticks) else "✖"
             )
             table.add_row(
                 streak.name,
