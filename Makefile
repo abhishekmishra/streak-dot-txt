@@ -3,7 +3,7 @@
 
 dist:
 	@echo "Building binary in dist folder using pyinstaller"
-	pyinstaller --name=streakdottxt streakdottxt.py
+	pyinstaller --name=streakdottxt --noconfirm streakdottxt.py
 
 clean:
 	@echo "Cleaning up the dist folder"
