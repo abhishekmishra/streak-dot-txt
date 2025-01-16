@@ -456,12 +456,12 @@ def list(ctx):
     streak_files = [f for f in files if f.startswith("streak-") and f.endswith(".txt")]
     if streak_files:
         table = Table(title="Streaks", box=box.SIMPLE)
+        table.add_column("Today")
         table.add_column("Name")
         table.add_column("Tick")
         table.add_column("Longest Streak")
         table.add_column("Current Streak")
         table.add_column("Tick Average")
-        table.add_column("Today")
 
         for streak_file in streak_files:
             streak = Streak(os.path.join(dir, streak_file))
@@ -470,12 +470,12 @@ def list(ctx):
                 "✓" if any(tick.get_date() == today for tick in streak.ticks) else "✖"
             )
             table.add_row(
+                today_status,
                 streak.name,
                 streak.tick,
                 str(streak.stats["longest_streak"]),
                 str(streak.stats["current_streak"]),
                 f"{streak.stats['tick_average'] * 100:.0f}%",
-                today_status,
             )
 
         console = Console()
