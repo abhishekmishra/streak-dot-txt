@@ -85,6 +85,11 @@ class Streak:
 
     It has a streak_file which is the file where the streak is stored.
     The metadata (name and tick), the ticks, and the stats are read from the file.
+
+    self.period: represents the period of the tick in number of intervals.
+                if the task is done once per day then period is 1
+                if the task is done once per week then period is 7
+                if the task is done once per month then period is the length of the month
     """
 
     def __init__(self, streak_file):
@@ -92,6 +97,7 @@ class Streak:
         self.metadata = {}
         self.name = None
         self.tick = None
+        self.period = None
 
         self.ticks = []
         self.years = []
@@ -143,6 +149,7 @@ class Streak:
         All of the ticks are stored in the ticks list
         """
         if self.tick == "Daily":
+            self.period = 1
             with open(self.streak_file, "r") as f:
                 # gobble up the yaml metadata if it exists
                 line = f.readline()
