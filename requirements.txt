@@ -2,3 +2,4 @@ click
 rich
 python-dateutil
 pyinstaller
+coverage
