@@ -143,26 +143,31 @@ class Streak:
         """
         Read the ticks from the file
 
-        Currently only ticks with tick type "Daily" are supported
+        Supports both Daily and Weekly tick types.
         Each line after the metadata is a tick
         Each tick is in the date format ISO8601
         All of the ticks are stored in the ticks list
         """
         if self.tick == "Daily":
             self.period = 1
-            with open(self.streak_file, "r") as f:
-                # gobble up the yaml metadata if it exists
-                line = f.readline()
-                if line == "---\n":
-                    while True:
-                        line = f.readline()
-                        if line == "---\n":
-                            break
-                # read the ticks
-                while line:
+        elif self.tick == "Weekly":
+            self.period = 7
+        else:
+            raise ValueError(f"Unsupported tick type: {self.tick}")
+
+        with open(self.streak_file, "r") as f:
+            # gobble up the yaml metadata if it exists
+            line = f.readline()
+            if line == "---\n":
+                while True:
                     line = f.readline()
-                    if line:
-                        self.ticks.append(DailyTick(line.strip()))
+                    if line == "---\n":
+                        break
+            # read the ticks
+            while line:
+                line = f.readline()
+                if line:
+                    self.ticks.append(DailyTick(line.strip()))
 
     def get_years(self):
         """
@@ -176,21 +181,28 @@ class Streak:
 
     def mark_today(self):
         """
-        Mark today as ticked, but only if it is not already ticked
+        Mark today or this week as ticked, but only if it is not already ticked
         """
-        # print the tick dates
-        # for tick in self.ticks:
-        #     print(tick.get_date())
         today = datetime.datetime.now()
-        today_tick = DailyTick(today.isoformat())
-        # check if today is already ticked
-        # match only the date part of the tick
-        if today_tick.get_date() not in [tick.get_date() for tick in self.ticks]:
-            print("Adding today's tick :", today_tick.tick_datetime)
-            self.ticks.append(today_tick)
-            self.write_streak()
-        else:
-            print("Today is already ticked")
+        if self.tick == "Daily":
+            today_tick = DailyTick(today.isoformat())
+            if today_tick.get_date() not in [tick.get_date() for tick in self.ticks]:
+                print("Adding today's tick:", today_tick.tick_datetime)
+                self.ticks.append(today_tick)
+                self.write_streak()
+            else:
+                print("Today is already ticked")
+        elif self.tick == "Weekly":
+            start_of_week = today - datetime.timedelta(days=today.weekday())
+            week_tick = DailyTick(start_of_week.isoformat())
+            if week_tick.get_week_in_year() not in [
+                tick.get_week_in_year() for tick in self.ticks
+            ]:
+                print("Adding this week's tick:", week_tick.tick_datetime)
+                self.ticks.append(week_tick)
+                self.write_streak()
+            else:
+                print("This week is already ticked")
 
     def write_streak(self):
         """
@@ -211,10 +223,10 @@ class Streak:
         Calculate the stats for the streak
 
         total_days - total days the streak has been active, first tick to current date
-        ticked_days - total days the streak has been ticked
-        unticked_days - total days the streak has not been ticked (total_days - ticked_days)
-        current_streak - current streak of ticked days
-        longest_streak - longest streak of ticked days
+        ticked_days - total days or weeks the streak has been ticked
+        unticked_days - total days or weeks the streak has not been ticked (total_days - ticked_days)
+        current_streak - current streak of ticked days or weeks
+        longest_streak - longest streak of ticked days or weeks
         """
         if not self.ticks:
             self.stats["total_days"] = 0
@@ -225,9 +237,15 @@ class Streak:
             self.stats["tick_average"] = 0
             return
 
-        self.stats["total_days"] = (
-            datetime.datetime.now().date() - self.ticks[0].get_date()
-        ).days + 1
+        if self.tick == "Daily":
+            self.stats["total_days"] = (
+                datetime.datetime.now().date() - self.ticks[0].get_date()
+            ).days + 1
+        elif self.tick == "Weekly":
+            self.stats["total_days"] = (
+                (datetime.datetime.now().date() - self.ticks[0].get_date()).days // 7
+            ) + 1
+
         self.stats["ticked_days"] = len(self.ticks)
         self.stats["unticked_days"] = (
             self.stats["total_days"] - self.stats["ticked_days"]
@@ -242,11 +260,14 @@ class Streak:
         last_tick_date = None
 
         for single_date in (
-            self.ticks[0].get_date() + datetime.timedelta(n)
+            self.ticks[0].get_date() + datetime.timedelta(n * self.period)
             for n in range(self.stats["total_days"])
         ):
             if single_date in tick_dates:
-                if last_tick_date is None or (single_date - last_tick_date).days == 1:
+                if (
+                    last_tick_date is None
+                    or (single_date - last_tick_date).days == self.period
+                ):
                     current_streak += 1
                 else:
                     current_streak = 1

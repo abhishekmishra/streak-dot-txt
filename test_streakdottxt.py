@@ -35,6 +35,15 @@ class TestStreak(unittest.TestCase):
         self.assertEqual(streak.name, "Test Streak")
         self.assertEqual(streak.tick, "Daily")
 
+    def test_read_metadata_weekly(self):
+        with open(self.streak_file, "w") as f:
+            f.write(
+                "---\nname: Weekly Streak\ntick: Weekly\n---\n2025-01-01T00:00:00\n2025-01-08T00:00:00\n"
+            )
+        streak = Streak(self.streak_file)
+        self.assertEqual(streak.name, "Weekly Streak")
+        self.assertEqual(streak.tick, "Weekly")
+
     def test_read_ticks(self):
         streak = Streak(self.streak_file)
         self.assertEqual(len(streak.ticks), 2)
@@ -46,6 +55,19 @@ class TestStreak(unittest.TestCase):
         self.assertEqual(len(streak.ticks), 3)
         self.assertEqual(streak.ticks[-1].get_date(), datetime.datetime.now().date())
 
+    def test_mark_this_week(self):
+        with open(self.streak_file, "w") as f:
+            f.write(
+                "---\nname: Weekly Streak\ntick: Weekly\n---\n2025-01-01T00:00:00\n2025-01-08T00:00:00\n"
+            )
+        streak = Streak(self.streak_file)
+        streak.mark_today()
+        self.assertEqual(len(streak.ticks), 3)
+        self.assertEqual(
+            streak.ticks[-1].get_week_in_year(),
+            datetime.datetime.now().isocalendar()[1],
+        )
+
     def test_calculate_stats(self):
         streak = Streak(self.streak_file)
         streak.calculate_stats()
@@ -53,6 +75,19 @@ class TestStreak(unittest.TestCase):
             streak.stats["total_days"],
             (datetime.datetime.now().date() - datetime.date(2025, 1, 1)).days + 1,
         )
+        self.assertEqual(streak.stats["ticked_days"], 2)
+
+    def test_calculate_stats_weekly(self):
+        with open(self.streak_file, "w") as f:
+            f.write(
+                "---\nname: Weekly Streak\ntick: Weekly\n---\n2025-01-01T00:00:00\n2025-01-08T00:00:00\n"
+            )
+        streak = Streak(self.streak_file)
+        streak.calculate_stats()
+        total_weeks = (
+            (datetime.datetime.now().date() - datetime.date(2025, 1, 1)).days // 7
+        ) + 1
+        self.assertEqual(streak.stats["total_days"], total_weeks)
         self.assertEqual(streak.stats["ticked_days"], 2)
 
 
