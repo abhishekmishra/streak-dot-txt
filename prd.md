@@ -42,12 +42,24 @@ frequency: 5     # Optional, e.g., 5 times per period
 ```
 
 ### 4.2. Entries
-- Each line after metadata is an entry (ISO 8601 date).
-- Optionally, entries can include quantity and comment:
+- Each line after metadata is an entry (ISO 8601 date) and represents a day the streak action was performed.
+- If a date is missing, it means "not done" for that day—do not add explicit entries for missed days.
+- Optionally, entries can include quantity, unit, and comment:
   ```
   2025-01-05 20 reps # Felt great!
-  2025-01-06 # Missed, was sick
+  2025-01-07
+  2025-01-08 5 km # Outdoor run
+  2025-01-09 1.5 hours # Yoga session
   ```
+- **Format:**
+  - `YYYY-MM-DD [quantity unit] [# comment]`
+  - Date is required. Quantity and unit are optional. Comment (after `#`) is optional.
+  - The absence of an entry for a date means the action was not performed on that day.
+- **Parsing:**
+  - Split at the first `#` for the comment.
+  - The first token is always the date.
+  - If a second token exists and is a number, it is the quantity. If a third token exists, it is the unit.
+  - Everything after `#` is the comment.
 
 ---
 
@@ -94,6 +106,19 @@ We'll use Pydantic models for request/response validation and serialization.
 **File Path Resolution:**
 - The API returns the file path for each streak, or the CLI reconstructs it using the same slugification logic as the backend.
 
+**Entry (Tick) Format:**
+- Each entry in the file corresponds to a performed action. No entry means no action for that date.
+- The API parses each entry line as:
+  - `date` (required, ISO 8601)
+  - `quantity` (optional, float)
+  - `unit` (optional, string)
+  - `comment` (optional, string, after `#`)
+- Example parsing logic:
+  - Split line at `#` for comment.
+  - First token is date.
+  - Second token (if numeric) is quantity.
+  - Third token (if present) is unit.
+
 **1. Streak:** Represents a single streak.
    - `id`: (str, e.g., `streak-jumping-jacks`) - Unique identifier, derived from the slugified name and used as the filename.
    - `name`: (str) - Name of the streak.
@@ -115,13 +140,14 @@ We'll use Pydantic models for request/response validation and serialization.
    - `streak_id`: (str) - Identifier of the parent streak.
    - `date`: (date) - ISO 8601 date of the entry.
    - `quantity`: (float, optional) - Optional quantity associated with the entry.
+   - `unit`: (str, optional) - Optional unit associated with the quantity.
    - `comment`: (str, optional) - Optional comment for the entry.
    - `recorded_at`: (datetime) - Timestamp of recording.
 
    *Pydantic Models for Entry:*
-     - `EntryBase(BaseModel)`: `date`, `quantity` (optional), `comment` (optional)
+     - `EntryBase(BaseModel)`: `date`, `quantity` (optional), `unit` (optional), `comment` (optional)
      - `EntryCreate(EntryBase)`: For creating new entries.
-     - `EntryUpdate(BaseModel)`: `quantity` (optional), `comment` (optional)
+     - `EntryUpdate(BaseModel)`: `quantity` (optional), `unit` (optional), `comment` (optional)
      - `EntryResponse(EntryBase)`: Includes `id`, `streak_id`, `recorded_at`.
 
 **3. StreakStats:** Calculated statistics for a streak.
@@ -164,11 +190,12 @@ This structure ensures that all data manipulation and business logic are central
 ### 6.2. CLI Layer
 - The CLI is a thin wrapper that calls the API for all operations.
 - No direct file access in CLI code.
+- The CLI only records performed actions; it does not allow explicit 'missed' or 'not done' entries.
 
 #### 6.2.1. Commands
 - `list`: List all streaks with summary (name, tick, current streak, today's status, etc.).
 - `new --name <name> [--tick <type>]`: Create a new streak file.
-- `tick --name <name> [--quantity <n>] [--comment <text>]`: Add a tick for today.
+- `tick --name <name> [--quantity <n>] [--unit <unit>] [--comment <text>]`: Add a tick for today. Only records performed actions.
 - `view --name <name>`: Show detailed stats and calendar for a streak.
 - `edit --name <name>`: Open the streak file in the default editor.
 - `config --dir <path>`: Set or show the streaks directory.
@@ -177,6 +204,7 @@ This structure ensures that all data manipulation and business logic are central
 - Rich terminal tables for summaries and stats.
 - Calendar view for visualizing streaks.
 - Clear error messages for ambiguous or missing streaks.
+- CLI output and API both treat missing entries as 'not done'.
 
 ### 6.3. Web Service Layer (Future)
 - A RESTful API (e.g., using Flask or FastAPI) will use the same data access API.
