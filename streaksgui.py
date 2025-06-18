@@ -32,7 +32,38 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import os
 import datetime
-from streakdottxt import Streak, DEFAULT_STREAKS_DIR
+from streak_core import Streak, StreakFileManager, StreakStatsCalculator, DEFAULT_STREAKS_DIR
+
+
+class GUIStreak(Streak):
+    """
+    GUI-compatible Streak class that includes file path and auto-save functionality.
+    """
+    
+    def __init__(self, file_path=None):
+        super().__init__()
+        self.file_path = file_path
+        
+        if file_path:
+            # Load from file
+            loaded_streak = StreakFileManager.load_from_file(file_path)
+            self.name = loaded_streak.name
+            self.tick = loaded_streak.tick
+            self.metadata = loaded_streak.metadata
+            self.ticks = loaded_streak.ticks
+            self.period = loaded_streak.period
+            
+            # Calculate statistics
+            StreakStatsCalculator.calculate_stats(self)
+    
+    def mark_today(self):
+        """Mark today and save to file automatically"""
+        result = super().mark_today()
+        if result and self.file_path:
+            StreakFileManager.save_to_file(self, self.file_path)
+            # Recalculate stats
+            StreakStatsCalculator.calculate_stats(self)
+        return result
 
 
 class QuickTickDashboard:
@@ -103,9 +134,7 @@ class QuickTickDashboard:
             command=self.create_new_streak,
             font=("Arial", 12),
         )
-        new_streak_btn.pack(side="left", padx=(10, 0))
-
-        # Summary label
+        new_streak_btn.pack(side="left", padx=(10, 0))        # Summary label
         self.summary_label = tk.Label(bottom_frame, text="", font=("Arial", 14, "bold"))
         self.summary_label.pack()
 
@@ -116,14 +145,11 @@ class QuickTickDashboard:
 
         self.streaks = []
         try:
-            files = os.listdir(self.streaks_dir)
-            streak_files = [
-                f for f in files if f.startswith("streak-") and f.endswith(".txt")
-            ]
+            streak_files = StreakFileManager.list_streak_files(self.streaks_dir)
 
             for streak_file in streak_files:
                 try:
-                    streak = Streak(os.path.join(self.streaks_dir, streak_file))
+                    streak = GUIStreak(streak_file)
                     self.streaks.append(streak)
                 except Exception as e:
                     print(f"Error loading {streak_file}: {e}")
@@ -334,9 +360,7 @@ class NewStreakDialog:
             font=("Arial", 12),
             width=12,
         )
-        cancel_btn.pack(side="left", padx=5)
-
-        # Bind Enter key to create
+        cancel_btn.pack(side="left", padx=5)        # Bind Enter key to create
         self.dialog.bind("<Return>", lambda e: self.create_streak())
 
     def create_streak(self):
@@ -348,28 +372,17 @@ class NewStreakDialog:
         tick_type = self.tick_var.get()
 
         try:
-            # Create filename (similar to CLI logic)
-            filename = f"streak-{name.lower().replace(' ', '-')}.txt"
-            filepath = os.path.join(self.streaks_dir, filename)
-
-            # Check if file already exists
-            if os.path.exists(filepath):
-                messagebox.showerror(
-                    "Error", f"A streak with name '{name}' already exists"
-                )
-                return
-
-            # Create the streak file with YAML frontmatter
-            with open(filepath, "w") as f:
-                f.write("---\n")
-                f.write(f"name: {name}\n")
-                f.write(f"tick: {tick_type}\n")
-                f.write("---\n")
-
+            # Use the StreakFileManager to create the streak file
+            filepath = StreakFileManager.create_new_streak_file(self.streaks_dir, name, tick_type)
+            
             self.result = True
             messagebox.showinfo("Success", f"Created new streak: '{name}'")
             self.dialog.destroy()
 
+        except FileExistsError:
+            messagebox.showerror(
+                "Error", f"A streak with name '{name}' already exists"
+            )
         except Exception as e:
             messagebox.showerror("Error", f"Failed to create streak: {str(e)}")
 
