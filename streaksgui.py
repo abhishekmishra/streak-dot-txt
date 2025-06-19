@@ -54,11 +54,12 @@ class UIConstants:
     SMALL_FONT = ("Arial", 10)
 
     # Colors
-    SUCCESS_COLOR = "#4CAF50"
-    PRIMARY_COLOR = "#2196F3"
-    APP_BG = "black"
-    TEXT_GRAY = "gray"
-    TEXT_FG = "green"
+    SUCCESS_COLOR = "#405240"  # Grayish green
+    PRIMARY_COLOR = "#4A6B8A"  # Lighter grayish blue
+    APP_BG = "#000000"  # Black
+    TEXT_GRAY = "#808080"  # Gray
+    TEXT_FG = "#00FF00"  # Green
+    BORDER_FG = "#31E231"  # Light green border color
 
     # Padding
     MAIN_PADDING = 20
@@ -166,6 +167,15 @@ class QuickTickDashboard:
             text="🔄 Refresh",
             command=self.refresh_streaks,
             font=UIConstants.BODY_FONT,
+            bg=UIConstants.APP_BG,
+            fg=UIConstants.TEXT_FG,
+            activebackground=UIConstants.APP_BG,
+            activeforeground=UIConstants.TEXT_FG,
+            highlightbackground=UIConstants.BORDER_FG,
+            highlightcolor=UIConstants.BORDER_FG,
+            highlightthickness=1,
+            relief="solid",
+            bd=1,
         )
         refresh_btn.pack(side="left")
 
@@ -174,6 +184,15 @@ class QuickTickDashboard:
             text="➕ New Streak",
             command=self.create_new_streak,
             font=UIConstants.BODY_FONT,
+            bg=UIConstants.APP_BG,
+            fg=UIConstants.TEXT_FG,
+            activebackground=UIConstants.APP_BG,
+            activeforeground=UIConstants.TEXT_FG,
+            highlightbackground=UIConstants.BORDER_FG,
+            highlightcolor=UIConstants.BORDER_FG,
+            highlightthickness=1,
+            relief="solid",
+            bd=1,
         )
         new_streak_btn.pack(side="left", padx=(UIConstants.SMALL_PADDING, 0))
 
@@ -299,23 +318,42 @@ class QuickTickDashboard:
                 button_frame,
                 text="✓ Done Today",
                 bg=UIConstants.SUCCESS_COLOR,
-                fg="white",
+                fg=UIConstants.TEXT_FG,
+                activebackground=UIConstants.SUCCESS_COLOR,
+                activeforeground=UIConstants.TEXT_FG,
                 state="disabled",
                 width=12,
                 height=2,
                 font=UIConstants.BODY_FONT,
+                highlightbackground=UIConstants.BORDER_FG,
+                highlightcolor=UIConstants.BORDER_FG,
+                highlightthickness=1,
+                relief="solid",
+                bd=1,
+                disabledforeground=UIConstants.TEXT_FG,
             )
         else:
             tick_btn = tk.Button(
                 button_frame,
                 text="Mark Done",
                 bg=UIConstants.PRIMARY_COLOR,
-                fg="white",
+                fg=UIConstants.TEXT_FG,
+                activebackground=UIConstants.PRIMARY_COLOR,
+                activeforeground=UIConstants.TEXT_FG,
                 width=12,
                 height=2,
                 font=UIConstants.BODY_FONT,
                 command=lambda s=streak: self.tick_streak(s),
+                highlightbackground=UIConstants.BORDER_FG,
+                highlightcolor=UIConstants.BORDER_FG,
+                highlightthickness=1,
+                relief="solid",
+                bd=1,
+                overrelief="solid",
+                default="normal",
             )
+            # Force the button to use our colors
+            tick_btn.config(bg=UIConstants.PRIMARY_COLOR)
 
         tick_btn.pack()
 
@@ -412,9 +450,16 @@ class NewStreakDialog:
             text="Create Streak",
             command=self.create_streak,
             bg="#4CAF50",
-            fg="white",
+            fg="#FFFFFF",
+            activebackground="#4CAF50",
+            activeforeground="#FFFFFF",
             font=("Arial", 12, "bold"),
             width=12,
+            highlightbackground=UIConstants.BORDER_FG,
+            highlightcolor=UIConstants.BORDER_FG,
+            highlightthickness=1,
+            relief="solid",
+            bd=1,
         )
         create_btn.pack(side="left", padx=5)
 
@@ -424,6 +469,15 @@ class NewStreakDialog:
             command=self.dialog.destroy,
             font=("Arial", 12),
             width=12,
+            bg=UIConstants.APP_BG,
+            fg=UIConstants.TEXT_FG,
+            activebackground=UIConstants.APP_BG,
+            activeforeground=UIConstants.TEXT_FG,
+            highlightbackground=UIConstants.BORDER_FG,
+            highlightcolor=UIConstants.BORDER_FG,
+            highlightthickness=1,
+            relief="solid",
+            bd=1,
         )
         cancel_btn.pack(side="left", padx=5)  # Bind Enter key to create
         self.dialog.bind("<Return>", lambda e: self.create_streak())
