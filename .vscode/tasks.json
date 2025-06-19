@@ -1,0 +1,25 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Streaks GUI",
+			"type": "shell",
+			"command": "${workspaceFolder}/.env/Scripts/python.exe",
+			"args": [
+				"streaksgui.py"
+			],
+			"group": "build",
+			"isBackground": false,
+			"problemMatcher": [],
+			"windows": {
+				"command": "${workspaceFolder}/.env/Scripts/python.exe"
+			},
+			"linux": {
+				"command": "${workspaceFolder}/.env/bin/python"
+			},
+			"osx": {
+				"command": "${workspaceFolder}/.env/bin/python"
+			}
+		}
+	]
+}
