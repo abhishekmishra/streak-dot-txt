@@ -56,9 +56,9 @@ class UIConstants:
     # Colors
     SUCCESS_COLOR = "#4CAF50"
     PRIMARY_COLOR = "#2196F3"
-    BACKGROUND_COLOR = "white"
+    APP_BG = "black"
     TEXT_GRAY = "gray"
-    TEXT_DARK_BLUE = "darkblue"
+    TEXT_FG = "green"
 
     # Padding
     MAIN_PADDING = 20
@@ -249,25 +249,25 @@ class QuickTickDashboard:
             self.scrollable_frame,
             relief="solid",
             borderwidth=1,
-            bg=UIConstants.BACKGROUND_COLOR,
+            bg=UIConstants.APP_BG,
         )
         streak_frame.pack(
             fill="x", padx=UIConstants.SMALL_PADDING, pady=UIConstants.SMALL_PADDING
         )
 
-        main_frame = tk.Frame(streak_frame, bg=UIConstants.BACKGROUND_COLOR)
+        main_frame = tk.Frame(streak_frame, bg=UIConstants.APP_BG)
         main_frame.pack(
             fill="x", padx=UIConstants.SMALL_PADDING, pady=UIConstants.SMALL_PADDING
         )
 
-        info_frame = tk.Frame(main_frame, bg=UIConstants.BACKGROUND_COLOR)
+        info_frame = tk.Frame(main_frame, bg=UIConstants.APP_BG)
         info_frame.pack(side="left", fill="x", expand=True)
 
         name_label = tk.Label(
             info_frame,
             text=streak.name,
             font=UIConstants.BODY_FONT,
-            bg=UIConstants.BACKGROUND_COLOR,
+            bg=UIConstants.APP_BG,
         )
         name_label.pack(anchor="w")
 
@@ -276,7 +276,7 @@ class QuickTickDashboard:
             text=f"Type: {streak.tick}",
             font=UIConstants.SMALL_FONT,
             fg=UIConstants.TEXT_GRAY,
-            bg=UIConstants.BACKGROUND_COLOR,
+            bg=UIConstants.APP_BG,
         )
         type_label.pack(anchor="w")
 
@@ -286,12 +286,12 @@ class QuickTickDashboard:
             info_frame,
             text=stats_text,
             font=UIConstants.BODY_FONT,
-            fg=UIConstants.TEXT_DARK_BLUE,
-            bg=UIConstants.BACKGROUND_COLOR,
+            fg=UIConstants.TEXT_FG,
+            bg=UIConstants.APP_BG,
         )
         stats_label.pack(anchor="w", pady=(UIConstants.SMALL_PADDING, 0))
 
-        button_frame = tk.Frame(main_frame, bg=UIConstants.BACKGROUND_COLOR)
+        button_frame = tk.Frame(main_frame, bg=UIConstants.APP_BG)
         button_frame.pack(side="right", padx=UIConstants.MAIN_PADDING)
 
         if already_ticked:
