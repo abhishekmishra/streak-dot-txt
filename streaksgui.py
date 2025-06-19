@@ -111,6 +111,13 @@ class QuickTickDashboard:
         self.setup_ui()
         self.load_streaks()
 
+    def _bind_mousewheel(self, widget):
+        def _on_mousewheel(event):
+            widget.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        widget.bind_all("<MouseWheel>", _on_mousewheel)  # Windows/macOS
+        widget.bind_all("<Button-4>", lambda e: widget.yview_scroll(-1, "units"))  # Linux scroll up
+        widget.bind_all("<Button-5>", lambda e: widget.yview_scroll(1, "units"))   # Linux scroll down
+
     def setup_ui(self):
         # Title
         title_label = tk.Label(
@@ -145,6 +152,7 @@ class QuickTickDashboard:
 
         canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         canvas.configure(yscrollcommand=scrollbar.set)
+        self._bind_mousewheel(canvas)
 
         canvas.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
