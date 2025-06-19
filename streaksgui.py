@@ -168,10 +168,12 @@ class QuickTickDashboard:
 
         # Buttons frame
         button_frame = tk.Frame(bottom_frame, bg=UIConstants.APP_BG)
-        button_frame.pack(side="top", fill="x", pady=(0, UIConstants.SMALL_PADDING))
-
+        button_frame.pack(side="top", fill="x", pady=(0, UIConstants.SMALL_PADDING))        # Refresh button with border frame
+        refresh_frame = tk.Frame(button_frame, bg=UIConstants.BORDER_FG, bd=2, relief="solid")
+        refresh_frame.pack(side="left", padx=2, pady=2)
+        
         refresh_btn = tk.Button(
-            button_frame,
+            refresh_frame,
             text="🔄 Refresh",
             command=self.refresh_streaks,
             font=UIConstants.BODY_FONT,
@@ -179,16 +181,17 @@ class QuickTickDashboard:
             fg=UIConstants.TEXT_FG,
             activebackground=UIConstants.APP_BG,
             activeforeground=UIConstants.TEXT_FG,
-            highlightbackground=UIConstants.BORDER_FG,
-            highlightcolor=UIConstants.BORDER_FG,
-            highlightthickness=1,
-            relief="solid",
-            bd=1,
+            relief="flat",
+            bd=0,
         )
-        refresh_btn.pack(side="left")
+        refresh_btn.pack(padx=1, pady=1)
 
+        # New Streak button with border frame
+        new_streak_frame = tk.Frame(button_frame, bg=UIConstants.BORDER_FG, bd=2, relief="solid")
+        new_streak_frame.pack(side="left", padx=(UIConstants.SMALL_PADDING + 2, 2), pady=2)
+        
         new_streak_btn = tk.Button(
-            button_frame,
+            new_streak_frame,
             text="➕ New Streak",
             command=self.create_new_streak,
             font=UIConstants.BODY_FONT,
@@ -196,13 +199,10 @@ class QuickTickDashboard:
             fg=UIConstants.TEXT_FG,
             activebackground=UIConstants.APP_BG,
             activeforeground=UIConstants.TEXT_FG,
-            highlightbackground=UIConstants.BORDER_FG,
-            highlightcolor=UIConstants.BORDER_FG,
-            highlightthickness=1,
-            relief="solid",
-            bd=1,
+            relief="flat",
+            bd=0,
         )
-        new_streak_btn.pack(side="left", padx=(UIConstants.SMALL_PADDING, 0))        # Summary label
+        new_streak_btn.pack(padx=1, pady=1)# Summary label
         self.summary_label = tk.Label(
             bottom_frame, text="", font=UIConstants.SUBTITLE_FONT,
             bg=UIConstants.APP_BG, fg=UIConstants.TEXT_FG
