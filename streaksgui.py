@@ -40,6 +40,32 @@ from streak_core import (
 )
 
 
+# Add constants for UI settings
+class UIConstants:
+    WINDOW_WIDTH = 600
+    WINDOW_HEIGHT = 500
+    DIALOG_WIDTH = 400
+    DIALOG_HEIGHT = 300
+
+    # Fonts
+    TITLE_FONT = ("Arial", 18, "bold")
+    SUBTITLE_FONT = ("Arial", 14)
+    BODY_FONT = ("Arial", 12)
+    SMALL_FONT = ("Arial", 10)
+
+    # Colors
+    SUCCESS_COLOR = "#4CAF50"
+    PRIMARY_COLOR = "#2196F3"
+    BACKGROUND_COLOR = "white"
+    TEXT_GRAY = "gray"
+    TEXT_DARK_BLUE = "darkblue"
+
+    # Padding
+    MAIN_PADDING = 20
+    WIDGET_PADDING = 10
+    SMALL_PADDING = 5
+
+
 class GUIStreak(Streak):
     """
     GUI-compatible Streak class that includes file path and auto-save functionality.
@@ -75,7 +101,7 @@ class QuickTickDashboard:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Streak Quick Tick")
-        self.root.geometry("600x500")
+        self.root.geometry(f"{UIConstants.WINDOW_WIDTH}x{UIConstants.WINDOW_HEIGHT}")
 
         # Directory setup
         self.streaks_dir = DEFAULT_STREAKS_DIR
@@ -87,18 +113,23 @@ class QuickTickDashboard:
     def setup_ui(self):
         # Title
         title_label = tk.Label(
-            self.root, text="Today's Streaks", font=("Arial", 18, "bold")
+            self.root, text="Today's Streaks", font=UIConstants.TITLE_FONT
         )
-        title_label.pack(pady=15)
+        title_label.pack(pady=UIConstants.MAIN_PADDING)
 
         # Date display
         today = datetime.datetime.now().strftime("%A, %B %d, %Y")
-        date_label = tk.Label(self.root, text=today, font=("Arial", 14))
-        date_label.pack(pady=5)
+        date_label = tk.Label(self.root, text=today, font=UIConstants.SUBTITLE_FONT)
+        date_label.pack(pady=UIConstants.SMALL_PADDING)
 
         # Main content frame
         content_frame = tk.Frame(self.root)
-        content_frame.pack(fill="both", expand=True, padx=20, pady=10)
+        content_frame.pack(
+            fill="both",
+            expand=True,
+            padx=UIConstants.MAIN_PADDING,
+            pady=UIConstants.WIDGET_PADDING,
+        )
 
         # Scrollable frame for streaks
         canvas = tk.Canvas(content_frame)
@@ -119,17 +150,22 @@ class QuickTickDashboard:
 
         # Bottom frame
         bottom_frame = tk.Frame(self.root)
-        bottom_frame.pack(side="bottom", fill="x", padx=20, pady=15)
+        bottom_frame.pack(
+            side="bottom",
+            fill="x",
+            padx=UIConstants.MAIN_PADDING,
+            pady=UIConstants.WIDGET_PADDING,
+        )
 
         # Buttons frame
         button_frame = tk.Frame(bottom_frame)
-        button_frame.pack(side="top", fill="x", pady=(0, 10))
+        button_frame.pack(side="top", fill="x", pady=(0, UIConstants.SMALL_PADDING))
 
         refresh_btn = tk.Button(
             button_frame,
             text="🔄 Refresh",
             command=self.refresh_streaks,
-            font=("Arial", 12),
+            font=UIConstants.BODY_FONT,
         )
         refresh_btn.pack(side="left")
 
@@ -137,10 +173,14 @@ class QuickTickDashboard:
             button_frame,
             text="➕ New Streak",
             command=self.create_new_streak,
-            font=("Arial", 12),
+            font=UIConstants.BODY_FONT,
         )
-        new_streak_btn.pack(side="left", padx=(10, 0))  # Summary label
-        self.summary_label = tk.Label(bottom_frame, text="", font=("Arial", 14, "bold"))
+        new_streak_btn.pack(side="left", padx=(UIConstants.SMALL_PADDING, 0))
+
+        # Summary label
+        self.summary_label = tk.Label(
+            bottom_frame, text="", font=UIConstants.SUBTITLE_FONT
+        )
         self.summary_label.pack()
 
     def load_streaks(self):
@@ -165,101 +205,121 @@ class QuickTickDashboard:
 
     def display_streaks(self):
         """Display all streaks with tick buttons"""
-        # Clear existing widgets
+        self._clear_existing_widgets()
+
+        if not self.streaks:
+            self._show_no_streaks_message()
+            return
+
+        ticked_count = self._display_streak_items()
+        self._update_summary(ticked_count)
+
+    def _clear_existing_widgets(self):
         for widget in self.scrollable_frame.winfo_children():
             widget.destroy()
 
-        if not self.streaks:
-            no_streaks_label = tk.Label(
-                self.scrollable_frame,
-                text="No streaks found. Click 'New Streak' to create one!",
-                font=("Arial", 14),
-                fg="gray",
-            )
-            no_streaks_label.pack(pady=5)
-            self.summary_label.config(text="No streaks to display")
-            return
+    def _show_no_streaks_message(self):
+        no_streaks_label = tk.Label(
+            self.scrollable_frame,
+            text="No streaks found. Click 'New Streak' to create one!",
+            font=UIConstants.SUBTITLE_FONT,
+            fg=UIConstants.TEXT_GRAY,
+        )
+        no_streaks_label.pack(pady=UIConstants.SMALL_PADDING)
+        self.summary_label.config(text="No streaks to display")
 
+    def _display_streak_items(self):
         today = datetime.datetime.now().date()
         ticked_count = 0
 
         for streak in self.streaks:
-            # Check if already ticked today
-            already_ticked = any(tick.get_date() == today for tick in streak.ticks)
+            already_ticked = self._is_streak_ticked_today(streak, today)
             if already_ticked:
                 ticked_count += 1
 
-            # Create frame for each streak
-            streak_frame = tk.Frame(
-                self.scrollable_frame, relief="solid", borderwidth=1, bg="white"
+            self._create_streak_widget(streak, already_ticked)
+
+        return ticked_count
+
+    def _is_streak_ticked_today(self, streak, today):
+        return any(tick.get_date() == today for tick in streak.ticks)
+
+    def _create_streak_widget(self, streak, already_ticked):
+        streak_frame = tk.Frame(
+            self.scrollable_frame,
+            relief="solid",
+            borderwidth=1,
+            bg=UIConstants.BACKGROUND_COLOR,
+        )
+        streak_frame.pack(
+            fill="x", padx=UIConstants.SMALL_PADDING, pady=UIConstants.SMALL_PADDING
+        )
+
+        main_frame = tk.Frame(streak_frame, bg=UIConstants.BACKGROUND_COLOR)
+        main_frame.pack(
+            fill="x", padx=UIConstants.SMALL_PADDING, pady=UIConstants.SMALL_PADDING
+        )
+
+        info_frame = tk.Frame(main_frame, bg=UIConstants.BACKGROUND_COLOR)
+        info_frame.pack(side="left", fill="x", expand=True)
+
+        name_label = tk.Label(
+            info_frame,
+            text=streak.name,
+            font=UIConstants.BODY_FONT,
+            bg=UIConstants.BACKGROUND_COLOR,
+        )
+        name_label.pack(anchor="w")
+
+        type_label = tk.Label(
+            info_frame,
+            text=f"Type: {streak.tick}",
+            font=UIConstants.SMALL_FONT,
+            fg=UIConstants.TEXT_GRAY,
+            bg=UIConstants.BACKGROUND_COLOR,
+        )
+        type_label.pack(anchor="w")
+
+        stats = streak.stats
+        stats_text = f"Current: {stats['current_streak']} | Longest: {stats['longest_streak']} | Success: {stats['tick_average']*100:.0f}%"
+        stats_label = tk.Label(
+            info_frame,
+            text=stats_text,
+            font=UIConstants.BODY_FONT,
+            fg=UIConstants.TEXT_DARK_BLUE,
+            bg=UIConstants.BACKGROUND_COLOR,
+        )
+        stats_label.pack(anchor="w", pady=(UIConstants.SMALL_PADDING, 0))
+
+        button_frame = tk.Frame(main_frame, bg=UIConstants.BACKGROUND_COLOR)
+        button_frame.pack(side="right", padx=UIConstants.MAIN_PADDING)
+
+        if already_ticked:
+            tick_btn = tk.Button(
+                button_frame,
+                text="✓ Done Today",
+                bg=UIConstants.SUCCESS_COLOR,
+                fg="white",
+                state="disabled",
+                width=12,
+                height=2,
+                font=UIConstants.BODY_FONT,
             )
-            streak_frame.pack(fill="x", padx=2, pady=2)
-
-            # Main content frame
-            main_frame = tk.Frame(streak_frame, bg="white")
-            main_frame.pack(fill="x", padx=2, pady=2)
-
-            # Left side - streak info
-            info_frame = tk.Frame(main_frame, bg="white")
-            info_frame.pack(side="left", fill="x", expand=True)
-
-            name_label = tk.Label(
-                info_frame, text=streak.name, font=("Arial", 12, "bold"), bg="white"
+        else:
+            tick_btn = tk.Button(
+                button_frame,
+                text="Mark Done",
+                bg=UIConstants.PRIMARY_COLOR,
+                fg="white",
+                width=12,
+                height=2,
+                font=UIConstants.BODY_FONT,
+                command=lambda s=streak: self.tick_streak(s),
             )
-            name_label.pack(anchor="w")
 
-            # Tick type
-            type_label = tk.Label(
-                info_frame,
-                text=f"Type: {streak.tick}",
-                font=("Arial", 10),
-                fg="gray",
-                bg="white",
-            )
-            type_label.pack(anchor="w")
+        tick_btn.pack()
 
-            # Stats
-            stats = streak.stats
-            stats_text = f"Current: {stats['current_streak']} | Longest: {stats['longest_streak']} | Success: {stats['tick_average']*100:.0f}%"
-            stats_label = tk.Label(
-                info_frame,
-                text=stats_text,
-                font=("Arial", 11),
-                fg="darkblue",
-                bg="white",
-            )
-            stats_label.pack(anchor="w", pady=(5, 0))
-
-            # Right side - tick button
-            button_frame = tk.Frame(main_frame, bg="white")
-            button_frame.pack(side="right", padx=15)
-
-            if already_ticked:
-                tick_btn = tk.Button(
-                    button_frame,
-                    text="✓ Done Today",
-                    bg="#4CAF50",
-                    fg="white",
-                    state="disabled",
-                    width=12,
-                    height=2,
-                    font=("Arial", 12, "bold"),
-                )
-            else:
-                tick_btn = tk.Button(
-                    button_frame,
-                    text="Mark Done",
-                    bg="#2196F3",
-                    fg="white",
-                    width=12,
-                    height=2,
-                    font=("Arial", 12, "bold"),
-                    command=lambda s=streak: self.tick_streak(s),
-                )
-
-            tick_btn.pack()
-
-        # Update summary
+    def _update_summary(self, ticked_count):
         total_streaks = len(self.streaks)
         completion_rate = (
             (ticked_count / total_streaks * 100) if total_streaks > 0 else 0
