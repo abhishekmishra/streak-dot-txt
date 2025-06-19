@@ -32,18 +32,23 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import os
 import datetime
-from streak_core import Streak, StreakFileManager, StreakStatsCalculator, DEFAULT_STREAKS_DIR
+from streak_core import (
+    Streak,
+    StreakFileManager,
+    StreakStatsCalculator,
+    DEFAULT_STREAKS_DIR,
+)
 
 
 class GUIStreak(Streak):
     """
     GUI-compatible Streak class that includes file path and auto-save functionality.
     """
-    
+
     def __init__(self, file_path=None):
         super().__init__()
         self.file_path = file_path
-        
+
         if file_path:
             # Load from file
             loaded_streak = StreakFileManager.load_from_file(file_path)
@@ -52,10 +57,10 @@ class GUIStreak(Streak):
             self.metadata = loaded_streak.metadata
             self.ticks = loaded_streak.ticks
             self.period = loaded_streak.period
-            
+
             # Calculate statistics
             StreakStatsCalculator.calculate_stats(self)
-    
+
     def mark_today(self):
         """Mark today and save to file automatically"""
         result = super().mark_today()
@@ -134,7 +139,7 @@ class QuickTickDashboard:
             command=self.create_new_streak,
             font=("Arial", 12),
         )
-        new_streak_btn.pack(side="left", padx=(10, 0))        # Summary label
+        new_streak_btn.pack(side="left", padx=(10, 0))  # Summary label
         self.summary_label = tk.Label(bottom_frame, text="", font=("Arial", 14, "bold"))
         self.summary_label.pack()
 
@@ -171,7 +176,7 @@ class QuickTickDashboard:
                 font=("Arial", 14),
                 fg="gray",
             )
-            no_streaks_label.pack(pady=50)
+            no_streaks_label.pack(pady=5)
             self.summary_label.config(text="No streaks to display")
             return
 
@@ -188,18 +193,18 @@ class QuickTickDashboard:
             streak_frame = tk.Frame(
                 self.scrollable_frame, relief="solid", borderwidth=1, bg="white"
             )
-            streak_frame.pack(fill="x", padx=5, pady=5)
+            streak_frame.pack(fill="x", padx=2, pady=2)
 
             # Main content frame
             main_frame = tk.Frame(streak_frame, bg="white")
-            main_frame.pack(fill="x", padx=15, pady=15)
+            main_frame.pack(fill="x", padx=2, pady=2)
 
             # Left side - streak info
             info_frame = tk.Frame(main_frame, bg="white")
             info_frame.pack(side="left", fill="x", expand=True)
 
             name_label = tk.Label(
-                info_frame, text=streak.name, font=("Arial", 16, "bold"), bg="white"
+                info_frame, text=streak.name, font=("Arial", 12, "bold"), bg="white"
             )
             name_label.pack(anchor="w")
 
@@ -360,7 +365,7 @@ class NewStreakDialog:
             font=("Arial", 12),
             width=12,
         )
-        cancel_btn.pack(side="left", padx=5)        # Bind Enter key to create
+        cancel_btn.pack(side="left", padx=5)  # Bind Enter key to create
         self.dialog.bind("<Return>", lambda e: self.create_streak())
 
     def create_streak(self):
@@ -373,16 +378,16 @@ class NewStreakDialog:
 
         try:
             # Use the StreakFileManager to create the streak file
-            filepath = StreakFileManager.create_new_streak_file(self.streaks_dir, name, tick_type)
-            
+            filepath = StreakFileManager.create_new_streak_file(
+                self.streaks_dir, name, tick_type
+            )
+
             self.result = True
             messagebox.showinfo("Success", f"Created new streak: '{name}'")
             self.dialog.destroy()
 
         except FileExistsError:
-            messagebox.showerror(
-                "Error", f"A streak with name '{name}' already exists"
-            )
+            messagebox.showerror("Error", f"A streak with name '{name}' already exists")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to create streak: {str(e)}")
 
