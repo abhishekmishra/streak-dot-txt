@@ -168,41 +168,23 @@ class QuickTickDashboard:
 
         # Buttons frame
         button_frame = tk.Frame(bottom_frame, bg=UIConstants.APP_BG)
-        button_frame.pack(side="top", fill="x", pady=(0, UIConstants.SMALL_PADDING))        # Refresh button with border frame
-        refresh_frame = tk.Frame(button_frame, bg=UIConstants.BORDER_FG, bd=2, relief="solid")
-        refresh_frame.pack(side="left", padx=2, pady=2)
-        
-        refresh_btn = tk.Button(
-            refresh_frame,
+        button_frame.pack(side="top", fill="x", pady=(0, UIConstants.SMALL_PADDING))        # Create Refresh button using utility function
+        refresh_frame, refresh_btn = UIHelper.create_bordered_button(
+            parent=button_frame,
             text="🔄 Refresh",
-            command=self.refresh_streaks,
-            font=UIConstants.BODY_FONT,
-            bg=UIConstants.APP_BG,
-            fg=UIConstants.TEXT_FG,
-            activebackground=UIConstants.APP_BG,
-            activeforeground=UIConstants.TEXT_FG,
-            relief="flat",
-            bd=0,
+            command=self.refresh_streaks
         )
-        refresh_btn.pack(padx=1, pady=1)
+        refresh_frame.pack(side="left", padx=2, pady=2)
 
-        # New Streak button with border frame
-        new_streak_frame = tk.Frame(button_frame, bg=UIConstants.BORDER_FG, bd=2, relief="solid")
-        new_streak_frame.pack(side="left", padx=(UIConstants.SMALL_PADDING + 2, 2), pady=2)
-        
-        new_streak_btn = tk.Button(
-            new_streak_frame,
+        # Create New Streak button using utility function
+        new_streak_frame, new_streak_btn = UIHelper.create_bordered_button(
+            parent=button_frame,
             text="➕ New Streak",
-            command=self.create_new_streak,
-            font=UIConstants.BODY_FONT,
-            bg=UIConstants.APP_BG,
-            fg=UIConstants.TEXT_FG,
-            activebackground=UIConstants.APP_BG,
-            activeforeground=UIConstants.TEXT_FG,
-            relief="flat",
-            bd=0,
+            command=self.create_new_streak
         )
-        new_streak_btn.pack(padx=1, pady=1)# Summary label
+        new_streak_frame.pack(side="left", padx=(UIConstants.SMALL_PADDING + 2, 2), pady=2)
+
+        # Summary label
         self.summary_label = tk.Label(
             bottom_frame, text="", font=UIConstants.SUBTITLE_FONT,
             bg=UIConstants.APP_BG, fg=UIConstants.TEXT_FG
@@ -516,6 +498,111 @@ class NewStreakDialog:
             messagebox.showerror("Error", f"A streak with name '{name}' already exists")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to create streak: {str(e)}")
+
+
+class UIHelper:
+    """
+    Utility class for creating consistent UI elements with proper theming.
+    
+    This class provides static methods for creating UI components that follow
+    the application's dark theme with green borders and text.
+    """
+    
+    @staticmethod
+    def create_bordered_button(parent, text, command=None, font=None, 
+                              bg_color=None, fg_color=None, border_color=None,
+                              width=None, height=None, padx=2, pady=2):
+        """
+        Create a button with a visible colored border using a frame wrapper.
+        
+        This method creates a button with a clearly visible border by wrapping
+        the button in a colored frame. This approach ensures the border is
+        always visible regardless of platform or focus state.
+        
+        Args:
+            parent (tk.Widget): The parent widget to contain the button
+            text (str): The text to display on the button
+            command (callable, optional): The function to call when button is clicked
+            font (tuple, optional): Font specification (family, size, style). 
+                                  Defaults to UIConstants.BODY_FONT
+            bg_color (str, optional): Background color hex code. 
+                                    Defaults to UIConstants.APP_BG
+            fg_color (str, optional): Text color hex code. 
+                                    Defaults to UIConstants.TEXT_FG
+            border_color (str, optional): Border color hex code. 
+                                        Defaults to UIConstants.BORDER_FG
+            width (int, optional): Button width in characters
+            height (int, optional): Button height in text lines
+            padx (int): Horizontal padding around the border frame (default: 2)
+            pady (int): Vertical padding around the border frame (default: 2)
+            
+        Returns:
+            tuple: (border_frame, button) - The border frame and button widgets
+            
+        Example:
+            # Create a basic bordered button
+            frame, btn = UIHelper.create_bordered_button(
+                parent=button_container,
+                text="Click Me",
+                command=my_function
+            )
+            frame.pack(side="left", padx=5)
+            
+            # Create a custom styled button
+            frame, btn = UIHelper.create_bordered_button(
+                parent=button_container,
+                text="Custom Button",
+                command=my_function,
+                width=15,
+                height=2,
+                border_color="#FF0000"  # Red border
+            )
+            frame.pack(side="left", padx=10)
+        """
+        # Set default values from UIConstants if not provided
+        if font is None:
+            font = UIConstants.BODY_FONT
+        if bg_color is None:
+            bg_color = UIConstants.APP_BG
+        if fg_color is None:
+            fg_color = UIConstants.TEXT_FG
+        if border_color is None:
+            border_color = UIConstants.BORDER_FG
+            
+        # Create the border frame with colored background
+        border_frame = tk.Frame(
+            parent,
+            bg=border_color,
+            bd=2,
+            relief="solid"
+        )
+        
+        # Create the button inside the border frame
+        button_kwargs = {
+            'text': text,
+            'font': font,
+            'bg': bg_color,
+            'fg': fg_color,
+            'activebackground': bg_color,
+            'activeforeground': fg_color,
+            'relief': 'flat',
+            'bd': 0
+        }
+        
+        # Add optional parameters if provided
+        if command is not None:
+            button_kwargs['command'] = command
+        if width is not None:
+            button_kwargs['width'] = width
+        if height is not None:
+            button_kwargs['height'] = height
+            
+        button = tk.Button(border_frame, **button_kwargs)
+        
+        # Pack the button with small padding to show the border
+        button.pack(padx=1, pady=1)
+        
+        return border_frame, button
 
 
 if __name__ == "__main__":
