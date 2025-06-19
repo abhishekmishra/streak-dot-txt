@@ -295,6 +295,7 @@ class QuickTickDashboard:
             text=streak.name,
             font=UIConstants.BODY_FONT,
             bg=UIConstants.APP_BG,
+            fg=UIConstants.TEXT_FG,
         )
         name_label.pack(anchor="w")
 
@@ -313,7 +314,7 @@ class QuickTickDashboard:
             info_frame,
             text=stats_text,
             font=UIConstants.BODY_FONT,
-            fg=UIConstants.TEXT_FG,
+            fg=UIConstants.TEXT_GRAY,
             bg=UIConstants.APP_BG,
         )
         stats_label.pack(anchor="w", pady=(UIConstants.SMALL_PADDING, 0))
