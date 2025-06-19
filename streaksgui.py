@@ -103,6 +103,9 @@ class QuickTickDashboard:
         self.root = tk.Tk()
         self.root.title("Streak Quick Tick")
         self.root.geometry(f"{UIConstants.WINDOW_WIDTH}x{UIConstants.WINDOW_HEIGHT}")
+        
+        # Configure window theme
+        self.root.configure(bg=UIConstants.APP_BG)
 
         # Directory setup
         self.streaks_dir = DEFAULT_STREAKS_DIR
@@ -118,20 +121,19 @@ class QuickTickDashboard:
         widget.bind_all("<Button-4>", lambda e: widget.yview_scroll(-1, "units"))  # Linux scroll up
         widget.bind_all("<Button-5>", lambda e: widget.yview_scroll(1, "units"))   # Linux scroll down
 
-    def setup_ui(self):
-        # Title
+    def setup_ui(self):        # Title
         title_label = tk.Label(
-            self.root, text="Today's Streaks", font=UIConstants.TITLE_FONT
+            self.root, text="Today's Streaks", font=UIConstants.TITLE_FONT,
+            bg=UIConstants.APP_BG, fg=UIConstants.TEXT_FG
         )
         title_label.pack(pady=UIConstants.MAIN_PADDING)
 
         # Date display
         today = datetime.datetime.now().strftime("%A, %B %d, %Y")
-        date_label = tk.Label(self.root, text=today, font=UIConstants.SUBTITLE_FONT)
-        date_label.pack(pady=UIConstants.SMALL_PADDING)
-
-        # Main content frame
-        content_frame = tk.Frame(self.root)
+        date_label = tk.Label(self.root, text=today, font=UIConstants.SUBTITLE_FONT,
+                             bg=UIConstants.APP_BG, fg=UIConstants.TEXT_FG)
+        date_label.pack(pady=UIConstants.SMALL_PADDING)        # Main content frame
+        content_frame = tk.Frame(self.root, bg=UIConstants.APP_BG)
         content_frame.pack(
             fill="both",
             expand=True,
@@ -140,7 +142,7 @@ class QuickTickDashboard:
         )
 
         # Scrollable frame for streaks
-        canvas = tk.Canvas(content_frame)
+        canvas = tk.Canvas(content_frame, bg=UIConstants.APP_BG, highlightthickness=0)
         scrollbar = ttk.Scrollbar(
             content_frame, orient="vertical", command=canvas.yview
         )
@@ -155,10 +157,8 @@ class QuickTickDashboard:
         self._bind_mousewheel(canvas)
 
         canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-
-        # Bottom frame
-        bottom_frame = tk.Frame(self.root)
+        scrollbar.pack(side="right", fill="y")        # Bottom frame
+        bottom_frame = tk.Frame(self.root, bg=UIConstants.APP_BG)
         bottom_frame.pack(
             side="bottom",
             fill="x",
@@ -167,7 +167,7 @@ class QuickTickDashboard:
         )
 
         # Buttons frame
-        button_frame = tk.Frame(bottom_frame)
+        button_frame = tk.Frame(bottom_frame, bg=UIConstants.APP_BG)
         button_frame.pack(side="top", fill="x", pady=(0, UIConstants.SMALL_PADDING))
 
         refresh_btn = tk.Button(
@@ -202,11 +202,10 @@ class QuickTickDashboard:
             relief="solid",
             bd=1,
         )
-        new_streak_btn.pack(side="left", padx=(UIConstants.SMALL_PADDING, 0))
-
-        # Summary label
+        new_streak_btn.pack(side="left", padx=(UIConstants.SMALL_PADDING, 0))        # Summary label
         self.summary_label = tk.Label(
-            bottom_frame, text="", font=UIConstants.SUBTITLE_FONT
+            bottom_frame, text="", font=UIConstants.SUBTITLE_FONT,
+            bg=UIConstants.APP_BG, fg=UIConstants.TEXT_FG
         )
         self.summary_label.pack()
 
@@ -247,10 +246,10 @@ class QuickTickDashboard:
 
     def _show_no_streaks_message(self):
         no_streaks_label = tk.Label(
-            self.scrollable_frame,
-            text="No streaks found. Click 'New Streak' to create one!",
+            self.scrollable_frame,            text="No streaks found. Click 'New Streak' to create one!",
             font=UIConstants.SUBTITLE_FONT,
             fg=UIConstants.TEXT_GRAY,
+            bg=UIConstants.APP_BG,
         )
         no_streaks_label.pack(pady=UIConstants.SMALL_PADDING)
         self.summary_label.config(text="No streaks to display")
@@ -402,14 +401,15 @@ class NewStreakDialog:
     def __init__(self, parent, streaks_dir):
         self.parent = parent
         self.streaks_dir = streaks_dir
-        self.result = None
-
-        # Create dialog window
+        self.result = None        # Create dialog window
         self.dialog = tk.Toplevel(parent)
         self.dialog.title("Create New Streak")
         self.dialog.geometry("400x300")
         self.dialog.transient(parent)
         self.dialog.grab_set()
+        
+        # Configure dialog theme
+        self.dialog.configure(bg=UIConstants.APP_BG)
 
         # Center the dialog
         self.dialog.update_idletasks()
@@ -422,24 +422,29 @@ class NewStreakDialog:
     def setup_dialog(self):
         # Title
         title_label = tk.Label(
-            self.dialog, text="Create New Streak", font=("Arial", 16, "bold")
+            self.dialog, text="Create New Streak", font=("Arial", 16, "bold"),
+            bg=UIConstants.APP_BG, fg=UIConstants.TEXT_FG
         )
         title_label.pack(pady=20)
 
         # Name input
-        name_frame = tk.Frame(self.dialog)
+        name_frame = tk.Frame(self.dialog, bg=UIConstants.APP_BG)
         name_frame.pack(pady=10, padx=30, fill="x")
 
-        tk.Label(name_frame, text="Streak Name:", font=("Arial", 12)).pack(anchor="w")
-        self.name_entry = tk.Entry(name_frame, font=("Arial", 12))
+        tk.Label(name_frame, text="Streak Name:", font=("Arial", 12),
+                bg=UIConstants.APP_BG, fg=UIConstants.TEXT_FG).pack(anchor="w")
+        self.name_entry = tk.Entry(name_frame, font=("Arial", 12),
+                                  bg=UIConstants.APP_BG, fg=UIConstants.TEXT_FG,
+                                  insertbackground=UIConstants.TEXT_FG)
         self.name_entry.pack(fill="x", pady=(5, 0))
         self.name_entry.focus()
 
         # Tick type selection
-        tick_frame = tk.Frame(self.dialog)
+        tick_frame = tk.Frame(self.dialog, bg=UIConstants.APP_BG)
         tick_frame.pack(pady=10, padx=30, fill="x")
 
-        tk.Label(tick_frame, text="Tick Type:", font=("Arial", 12)).pack(anchor="w")
+        tk.Label(tick_frame, text="Tick Type:", font=("Arial", 12),
+                bg=UIConstants.APP_BG, fg=UIConstants.TEXT_FG).pack(anchor="w")
         self.tick_var = tk.StringVar(value="Daily")
         tick_combo = ttk.Combobox(
             tick_frame,
@@ -448,10 +453,8 @@ class NewStreakDialog:
             state="readonly",
             font=("Arial", 12),
         )
-        tick_combo.pack(fill="x", pady=(5, 0))
-
-        # Buttons
-        button_frame = tk.Frame(self.dialog)
+        tick_combo.pack(fill="x", pady=(5, 0))        # Buttons
+        button_frame = tk.Frame(self.dialog, bg=UIConstants.APP_BG)
         button_frame.pack(pady=30)
 
         create_btn = tk.Button(
