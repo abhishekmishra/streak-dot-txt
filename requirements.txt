@@ -3,3 +3,6 @@ rich
 python-dateutil
 pyinstaller
 coverage
+fastapi
+uvicorn[standard]
+python-multipart
